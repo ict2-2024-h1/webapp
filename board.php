@@ -181,7 +181,7 @@ echo "<p class='err'>{$err_msg_comment}</p>";
 <!-- 投稿タイトル -->
 <span><?php echo $post_item['title']; ?></span>
 <!-- 投稿者ID -->
-<span>／投稿者：<?php echo $post_item['contributor_id']; ?></span>
+<span>／投稿者  ：<?php echo $post_item['contributor_id']; ?></span>
 <!-- 投稿内容 -->
 <p class="p-pre"><?php echo $post_item['comment']; ?></p>
 <!-- 投稿日時 -->
