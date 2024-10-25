@@ -25,7 +25,7 @@
 		$uid = $tmp['UID'];
 		session_start();
 		$_SESSION['uid'] = $uid;
-            	header("Location: home.php");
+            	header("Location: board.php");
             	exit();
         }
     } catch (PDOException $e) {

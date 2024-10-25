@@ -15,18 +15,41 @@
     $pass = $_POST['pass'];
     $name = $_POST['name'];
 
-    $sql = "INSERT INTO Account"."(Email, Pass, Name)"."VALUES (:email, :pass, :name)";
+    try{
+        do {
+			$uid =
+			chr(mt_rand(65, 90)) . chr(mt_rand(65, 90)) . chr(mt_rand(65, 90)) .
+			chr(mt_rand(65, 90)) . chr(mt_rand(65, 90)) . chr(mt_rand(65, 90)) .
+			chr(mt_rand(65, 90)) . chr(mt_rand(65, 90)) . chr(mt_rand(65, 90)) .
+			chr(mt_rand(65, 90)) . chr(mt_rand(65, 90)) . chr(mt_rand(65, 90)) .
+			chr(mt_rand(65, 90)) . chr(mt_rand(65, 90)) . chr(mt_rand(65, 90)) .
+			chr(mt_rand(65, 90)) . chr(mt_rand(65, 90)) . chr(mt_rand(65, 90)) .
+			chr(mt_rand(65, 90)) . chr(mt_rand(65, 90));
+			session_start();
+	
+			// データベースで確認
+			$sql = "SELECT COUNT(*) FROM Account WHERE UID = :uid"; // UIDを確認
+			$stmt = $dbcon->prepare($sql);
+			$stmt->bindParam(':uid', $uid);
+			$stmt->execute();
+			
+			// すでに存在するか確認
+			$exists = $stmt->fetchColumn();
+		} while ($exists > 0); // 存在する場合、再度生成
+
+    $sql = "INSERT INTO Account"."(UID, Email, Pass, Name)"."VALUES (:uid, :email, :pass, :name)";
 	//echo $sql;
 
-	try{
+
         $stmt = $dbcon->prepare($sql);
+        $stmt->bindParam(':uid', $uid);
         $stmt->bindParam(':email', $email);
         $stmt->bindParam(':pass', $pass);
         $stmt->bindParam(':name', $name);
         $stmt->execute();
 		echo "登録が完了しました。<br/>";
 	}catch(PDOException $e){
-		echo "そのメールアドレスは登録済みです。<br/>";
+		echo "エラー: " . $e->getMessage() . "<br/>";
 	}
 	
 ?>
