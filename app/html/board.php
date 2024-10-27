@@ -199,7 +199,7 @@ echo "<p class='err'>{$err_msg_comment}</p>";
 <button class="btn--mg-c" type="submit" name="post_btn" value="post_btn">投稿</button>
 </form>
 <form action="search.php" method="post">
-<button type="submit" name="update_btn">編集</button>
+<button type="submit" name="update_btn">検索</button>
 <input type="hidden" name="post_id" value="<?php echo $post_item['id']; ?>">
 </form>
 </section>
