@@ -44,19 +44,6 @@ if (isset($_POST['post_btn'])) {
     $stmt->execute();
     $post_list = $stmt->fetchAll(PDO::FETCH_ASSOC);
 }
-
-/**
- * 投稿一覧取得処理
- */
-try {
-    $sql = 'SELECT * FROM board_info ORDER BY id DESC';
-    $stmt = $pdo->prepare($sql);
-    $stmt->execute();
-    $post_list = $stmt->fetchAll(PDO::FETCH_ASSOC);  // 投稿データを配列として取得
-} catch (PDOException $e) {
-    echo '接続失敗: ' . $e->getMessage();
-    exit();
-}
 ?>
 
 <!DOCTYPE html>
