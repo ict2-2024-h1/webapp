@@ -1,154 +1,187 @@
 body {
-margin: 0 auto;
-width: 700px;
-background-color: rgb(224, 224, 224);
+    margin: 0 auto;
+    width: 700px;
+    background-color: rgb(224, 224, 224);
 }
+
 hr {
-margin: 40px 0;
-border-color: rgb(137, 137, 137);
+    margin: 40px 0;
+    border-color: rgb(137, 137, 137);
 }
+
 h1 {
-text-align: center;
+    text-align: center;
 }
+
 li {
-list-style: none;
+    list-style: none;
 }
+
 p {
-margin: 0;
+    margin: 0;
 }
+
 p,
 span {
-color: #333;
+    color: #333;
 }
+
 input,
 textarea {
-padding: 10px;
-border: 1px solid gray;
-border-radius: 10px;
-width: 100%;
-box-sizing: border-box;
+    padding: 10px;
+    border: 1px solid gray;
+    border-radius: 10px;
+    width: 100%;
+    box-sizing: border-box;
 }
+
 textarea {
-line-height: 1.5;
+    line-height: 1.5;
 }
+
 button {
-display: block;
-margin-top: 20px;
-padding: 10px 30px;
-color: #fff;
-border-radius: 10px;
-cursor: pointer;
+    display: block;
+    margin-top: 20px;
+    padding: 10px 30px;
+    color: #fff;
+    border-radius: 10px;
+    cursor: pointer;
 }
+
 button[name="post_btn"] {
-border: 1px solid rgb(148, 148, 218);
-background-color: rgb(94, 94, 255);
+    border: 1px solid rgb(148, 148, 218);
+    background-color: rgb(94, 94, 255);
 }
+
 button[name="update_btn"],
 button[name="update_submit_btn"] {
-border: 1px solid rgb(62, 150, 62);
-background-color: rgb(74, 152, 74);
+    border: 1px solid rgb(62, 150, 62);
+    background-color: rgb(74, 152, 74);
 }
+
 button[name="delete_btn"],
 button[name="delete_submit_btn"] {
-border: 1px solid rgb(255, 31, 31);
-background-color: rgb(255, 48, 48);
+    border: 1px solid rgb(255, 31, 31);
+    background-color: rgb(255, 48, 48);
 }
+
 button[name="cancel_btn"] {
-border: 1px solid rgb(172, 172, 172);
-background-color: rgb(182, 182, 182);
+    border: 1px solid rgb(172, 172, 172);
+    background-color: rgb(182, 182, 182);
 }
+
 button[name="post_btn"]:hover {
-background-color: rgb(116, 116, 255);
+    background-color: rgb(116, 116, 255);
 }
+
 button[name="update_btn"]:hover,
 button[name="update_submit_btn"]:hover {
-background-color: rgb(83, 169, 83);
+    background-color: rgb(83, 169, 83);
 }
+
 button[name="delete_btn"]:hover,
 button[name="delete_submit_btn"]:hover {
-background-color: rgb(255, 82, 82);
+    background-color: rgb(255, 82, 82);
 }
+
 button[name="cancel_btn"]:hover {
-background-color: rgb(189, 189, 189);
+    background-color: rgb(189, 189, 189);
 }
+
 .btn--mg-c {
-margin: 0 auto;
+    margin: 0 auto;
 }
+
 .post-list button {
-margin: 30px 0 0 0;
-padding: 8px 20px;
+    margin: 30px 0 0 0;
+    padding: 8px 20px;
 }
+
 .post-list li {
-margin-bottom: 15px;
-padding: 20px 30px;
-background-color: #fff;
-border: 1px solid rgb(188, 188, 188);
-border-radius: 10px;
+    margin-bottom: 15px;
+    padding: 20px 30px;
+    background-color: #fff;
+    border: 1px solid rgb(188, 188, 188);
+    border-radius: 10px;
 }
+
 .post-list span {
-display: inline-block;
-margin-bottom: 25px;
+    display: inline-block;
+    margin-bottom: 25px;
 }
+
 .post-form__flex {
-display: flex;
-justify-content: center;
-column-gap: 15px;
-margin-bottom: 20px;
+    display: flex;
+    justify-content: center;
+    column-gap: 15px;
+    margin-bottom: 20px;
 }
+
 .post-form__flex>div:first-child {
-width: 250px;
+    width: 250px;
 }
+
 .post-form__flex>div:last-child {
-flex: 1;
+    flex: 1;
 }
+
 .btn-flex {
-display: flex;
-justify-content: center;
-column-gap: 15px;
+    display: flex;
+    justify-content: center;
+    column-gap: 15px;
 }
+
 .post-list li:last-child {
-margin-bottom: 0;
+    margin-bottom: 0;
 }
+
 .post-datetime {
-display: inline-block;
-margin-top: 25px;
-font-size: 12px;
-color: gray;
+    display: inline-block;
+    margin-top: 25px;
+    font-size: 12px;
+    color: gray;
 }
+
 .post-datetime__updated {
-display: inline-block;
-margin-left: 10px;
+    display: inline-block;
+    margin-left: 10px;
 }
+
 .updated-post {
-margin-left: auto;
-padding: 2px 5px;
-width: fit-content;
-font-size: 12px;
-border: 1px solid rgb(105, 105, 105);
-border-radius: 5px;
-color: rgb(105, 105, 105);
+    margin-left: auto;
+    padding: 2px 5px;
+    width: fit-content;
+    font-size: 12px;
+    border: 1px solid rgb(105, 105, 105);
+    border-radius: 5px;
+    color: rgb(105, 105, 105);
 }
+
 .no-post-msg {
-text-align: center;
+    text-align: center;
 }
+
 .delete-confirm-msg {
-text-align: center;
-margin-bottom: 30px;
-color: red;
-font-weight: bold;
+    text-align: center;
+    margin-bottom: 30px;
+    color: red;
+    font-weight: bold;
 }
+
 .delete-success-msg {
-text-align: center;
+    text-align: center;
 }
+
 .err {
-color: red;
-font-size: 13px;
+    color: red;
+    font-size: 13px;
 }
+
 /* 
 改行もそのまま表示するための指定
 これが無いと改行が半角スペースに変換されて
 表示されてしまう
 */
 .p-pre {
-white-space: pre-wrap;
+    white-space: pre-wrap;
 }

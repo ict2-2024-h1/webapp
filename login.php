@@ -1,16 +1,19 @@
 <?php
-    require_once("dbconnect.php"); 
-    $email=$_POST['email'];
-    $pass=$_POST['pass'];
+require_once("dbconnect.php");
+// $email=$_POST['email'];
+// $pass=$_POST['pass'];
+$email = isset($_POST['email']) ? $_POST['email'] : '';
+$pass = isset($_POST['pass']) ? $_POST['pass'] : '';
 
-    $sql="SELECT UID, Pass FROM Account ". " WHERE Email=:email";
-    try {
-        $stmt=$dbcon->prepare($sql);
-        $stmt->bindParam(':email', $email );
-        $stmt->execute();
-	$tmp=$stmt->fetch(PDO::FETCH_ASSOC);
-	if ($stmt->rowCount() == 0 || $pass!=$tmp['Pass']){
-		echo<<<EOD
+
+$sql = "SELECT UID, Pass FROM Account " . " WHERE Email=:email";
+try {
+	$stmt = $dbcon->prepare($sql);
+	$stmt->bindParam(':email', $email);
+	$stmt->execute();
+	$tmp = $stmt->fetch(PDO::FETCH_ASSOC);
+	if ($stmt->rowCount() == 0 || $pass != $tmp['Pass']) {
+		echo <<<EOD
 		<html>
 		<head><title>ERROR</title></head>
 		<body>
@@ -20,20 +23,20 @@
 		</body>
 		</html>
 		EOD;
-            	exit;
-	}else{
+		exit;
+	} else {
 		$uid = $tmp['UID'];
 		session_start();
 		$_SESSION['uid'] = $uid;
-            	header("Location: board.php");
-            	exit();
-        }
-    } catch (PDOException $e) {
-        die($e->getMessage());
-    }
+		header("Location: board.php");
+		exit();
+	}
+} catch (PDOException $e) {
+	die($e->getMessage());
+}
 
-$dbcon=null;
+$dbcon = null;
 ?>
 </body>
-</html>
 
+</html>
