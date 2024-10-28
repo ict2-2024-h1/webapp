@@ -171,6 +171,9 @@ exit();
 </head>
 <body>
     <h1>掲示板アプリ</h1>
+    <form action="logout.php" method="post" style="text-align: right;">
+        <button type="submit">ログアウト</button>
+    </form>
     <!-- 投稿フォーム -->
     <section class="post-form">
         <form action="#" method="post">
@@ -229,6 +232,10 @@ exit();
                     <?php if ($post_item['created_at'] < $post_item['updated_at']) : ?>
                     <span class="post-datetime post-datetime__updated">更新日時：<?php echo $post_item['updated_at']; ?></span>
                     <?php endif; ?>
+                </form>
+                <form action="Paticipation.php" method="post">
+                        <button type="submit" name="update_btn">参加</button>
+                        <input type="hidden" name="post_id" value="<?php echo $post_item['id']; ?>">
                 </form>
 <!-- 自分の投稿内容かつセッションが有効な間は編集・削除が可能 -->
                 <?php if ($post_item['contributor_id'] === $cont_id) : ?>
