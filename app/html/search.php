@@ -69,6 +69,10 @@ if (isset($_POST['post_btn'])) {
             </div>
             <button class="btn--mg-c" type="submit" name="post_btn" value="post_btn">検索</button>
         </form>
+        <form action="board.php" method="post">
+            <button type="submit" name="update_btn">掲示板に戻る</button>
+            <input type="hidden" name="post_id" value="<?php echo $post_item['id']; ?>">
+        </form>
     </section>
     <hr>
     
