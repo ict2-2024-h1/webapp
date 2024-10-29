@@ -58,10 +58,10 @@ try {
 * 投稿者ID（20桁）を生成
 */
 if (isset($_SESSION['cont_id'])) {
-$cont_id = $uid;
+    $cont_id = $uid;
 } else {
-$_SESSION['cont_id'] = $uid;
-$cont_id = $uid;
+    $_SESSION['cont_id'] = $uid;
+    $cont_id = $uid;
 }
 
 /**
@@ -69,60 +69,56 @@ $cont_id = $uid;
 */
 if (isset($_POST['post_btn'])) {
 // 更新操作用の処理
-unset($_SESSION['id']);
+    unset($_SESSION['id']);
 /**
 * セッション変数に情報を保存して
 * タイトルまたは投稿内容の片方だけが
 * 入力されていた場合、
 * 入力フォームに内容を保持する
 */
-if (isset($_POST['post_title']) && $_POST['post_title'] != '') {
-$_SESSION['title'] = $_POST['post_title'];
-} else {
-unset($_SESSION['title']);
-}
-if (isset($_POST['post_comment']) && $_POST['post_comment'] != '') {
-$_SESSION['comment'] = $_POST['post_comment'];
-} else {
-unset($_SESSION['comment']);
-}
+    if (isset($_POST['post_title']) && $_POST['post_title'] != '') {
+        $_SESSION['title'] = $_POST['post_title'];
+    } else {
+        unset($_SESSION['title']);
+    }
+    if (isset($_POST['post_comment']) && $_POST['post_comment'] != '') {
+        $_SESSION['comment'] = $_POST['post_comment'];
+    } else {
+        unset($_SESSION['comment']);
+    }
 /**
 * エラーメッセージ格納
 */
-if ($_POST['post_title'] == '') $err_msg_title  = '※タイトルを入力して下さい';
-if ($_POST['post_comment'] == '') $err_msg_comment  = '※投稿内容を入力して下さい';
+    if ($_POST['post_title'] == '') $err_msg_title  = '※タイトルを入力して下さい';
+    if ($_POST['post_comment'] == '') $err_msg_comment  = '※投稿内容を入力して下さい';
 /**
 * 必要項目がすべて入力されてたら投稿処理を実行
 */
-if (
-isset($_POST['post_title']) && $_POST['post_title'] != '' &&
-isset($_POST['post_comment']) && $_POST['post_comment'] != ''
-) {
-$title = $_POST['post_title'];
-$comment = $_POST['post_comment'];
-try {
+    if (isset($_POST['post_title']) && $_POST['post_title'] != '' &&isset($_POST['post_comment']) && $_POST['post_comment'] != '') {
+        $title = $_POST['post_title'];
+        $comment = $_POST['post_comment'];
+        try {
 /**
 * DB接続処理
 */
-$pdo = new PDO(DB_HOST, DB_USER, DB_PASSWORD, [
-PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,      // 例外が発生した際にスローする
-]);
+            $pdo = new PDO(DB_HOST, DB_USER, DB_PASSWORD, [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,]);
 /**
 * 投稿内容登録処理
 */
-$sql = ('
-INSERT INTO
-board_info (title, comment, contributor_id)
-VALUES
-(:TITLE, :COMMENT, :CONTRIBUTOR_ID)
-');
-$stmt = $pdo->prepare($sql);
+            $sql = ('
+                INSERT INTO
+                board_info (title, comment, contributor_id,participants)
+                VALUES
+                (:TITLE, :COMMENT, :CONTRIBUTOR_ID,:PARTICIPANTS)
+            ');
+            $stmt = $pdo->prepare($sql);
 // プレースホルダーに値をセット
-$stmt->bindValue(':TITLE', $title, PDO::PARAM_STR);
-$stmt->bindValue(':COMMENT', $comment, PDO::PARAM_STR);
-$stmt->bindValue(':CONTRIBUTOR_ID', $cont_id, PDO::PARAM_STR);
+            $stmt->bindValue(':TITLE', $title, PDO::PARAM_STR);
+            $stmt->bindValue(':COMMENT', $comment, PDO::PARAM_STR);
+            $stmt->bindValue(':CONTRIBUTOR_ID', $cont_id, PDO::PARAM_STR);
+            $stmt->bindValue(':PARTICIPANTS', $cont_id, PDO::PARAM_STR);
 // SQL実行
-$stmt->execute();
+            $stmt->execute();
 // 投稿に成功したらセッション変数を破棄
 unset($_SESSION['title']);
 unset($_SESSION['comment']);
@@ -233,10 +229,20 @@ exit();
                     <span class="post-datetime post-datetime__updated">更新日時：<?php echo $post_item['updated_at']; ?></span>
                     <?php endif; ?>
                 </form>
+                <?php if (strpos($post_item['participants'], $cont_id) !== false) : ?>
                 <form action="Paticipation.php" method="post">
                         <button type="submit" name="update_btn">参加</button>
                         <input type="hidden" name="post_id" value="<?php echo $post_item['id']; ?>">
                 </form>
+                <?php endif; ?>
+                <?php if (strpos($post_item['participants'], $cont_id) === false) : ?>
+                    <?php if (strpos($post_item['participants_wait'], $cont_id) === false) : ?>
+                    <form action="Paticipation_wait.php" method="post">
+                        <button type="submit" name="update_btn">参加申請</button>
+                        <input type="hidden" name="post_id" value="<?php echo $post_item['id']; ?>">
+                    </form>
+                    <?php endif; ?>
+                <?php endif; ?>
 <!-- 自分の投稿内容かつセッションが有効な間は編集・削除が可能 -->
                 <?php if ($post_item['contributor_id'] === $cont_id) : ?>
                 <div class="btn-flex">
@@ -246,6 +252,10 @@ exit();
                     </form>
                     <form action="delete-confirm.php" method="post">
                         <button type="submit" name="delete_btn">削除</button>
+                        <input type="hidden" name="post_id" value="<?php echo $post_item['id']; ?>">
+                    </form>
+                    <form action="Paticipation_edit.php" method="post">
+                        <button type="submit" name="delete_btn">参加者管理</button>
                         <input type="hidden" name="post_id" value="<?php echo $post_item['id']; ?>">
                     </form>
                 </div>
