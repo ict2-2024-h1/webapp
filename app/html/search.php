@@ -18,7 +18,7 @@ const DB_PASSWORD = '';
  * ユーザーID（UID）をセッションから取得
  */
 $uid = $_SESSION['uid']; // ユーザーIDをセッションから取得
-
+$cont_id=$uid;
 try {
     // データベースに接続
     $pdo = new PDO(DB_HOST, DB_USER, DB_PASSWORD);
@@ -100,18 +100,40 @@ if (isset($_POST['post_btn'])) {
                     <?php endif; ?>
                     
                     <!-- 自分の投稿の場合、編集・削除ボタンを表示 -->
-                    <?php if ($post_item['contributor_id'] === $uid) : ?>
-                    <div class="btn-flex">
-                        <form action="update-edit.php" method="post">
-                            <button type="submit" name="update_btn">編集</button>
-                            <input type="hidden" name="post_id" value="<?php echo htmlspecialchars($post_item['id'], ENT_QUOTES, 'UTF-8'); ?>">
-                        </form>
-                        <form action="delete-confirm.php" method="post">
-                            <button type="submit" name="delete_btn">削除</button>
-                            <input type="hidden" name="post_id" value="<?php echo htmlspecialchars($post_item['id'], ENT_QUOTES, 'UTF-8'); ?>">
-                        </form>
-                    </div>
+                    <?php if (strpos($post_item['participants'], $cont_id) !== false) : ?>
+                <form action="Paticipation.php" method="post">
+                        <button type="submit" name="update_btn">参加</button>
+                        <input type="hidden" name="post_id" value="<?php echo $post_item['id']; ?>">
+                </form>
+                <?php endif; ?>
+                <?php if (strpos($post_item['participants'], $cont_id) === false) : ?>
+                    <?php if (strpos($post_item['participants_wait'], $cont_id) === false) : ?>
+                    <form action="Paticipation_wait.php" method="post">
+                        <button type="submit" name="update_btn">参加申請</button>
+                        <input type="hidden" name="post_id" value="<?php echo $post_item['id']; ?>">
+                    </form>
                     <?php endif; ?>
+                <?php endif; ?>
+<!-- 自分の投稿内容かつセッションが有効な間は編集・削除が可能 -->
+                <?php if ($post_item['contributor_id'] === $cont_id) : ?>
+                <div class="btn-flex">
+                    <form action="update-edit.php" method="post">
+                        <button type="submit" name="update_btn">編集</button>
+                        <input type="hidden" name="post_id" value="<?php echo $post_item['id']; ?>">
+                    </form>
+                    <form action="delete-confirm.php" method="post">
+                        <button type="submit" name="delete_btn">削除</button>
+                        <input type="hidden" name="post_id" value="<?php echo $post_item['id']; ?>">
+                    </form>
+                    <form action="Paticipation_edit.php" method="post">
+                        <button type="submit" name="delete_btn">参加者管理</button>
+                        <input type="hidden" name="post_id" value="<?php echo $post_item['id']; ?>">
+                    </form>
+                </div>
+                <?php endif; ?>
+                <?php if (isset($_SESSION['id']) && ($_SESSION['id'] == $post_item['id'])): ?>
+                <p class='updated-post'>更新しました</p>
+                <?php endif; ?>
                 </li>
                 <?php endforeach; ?>
             </ul>
