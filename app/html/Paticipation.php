@@ -83,6 +83,10 @@ if (isset($_POST['update_btn']) && isset($_POST['post_id'])) {
         <input type="hidden" name="post_id" value="<?php echo htmlspecialchars($post_id, ENT_QUOTES, 'UTF-8'); ?>">
         <button type="submit" name="update_btn">メッセージ送信</button>
     </form>
+    <form action="board.php" method="post">
+            <button type="submit" name="update_btn">掲示板に戻る</button>
+            <input type="hidden" name="post_id" value="<?php echo $post_item['id']; ?>">
+    </form>
 
     <!-- メッセージ一覧 -->
     <h2>メッセージ一覧</h2>

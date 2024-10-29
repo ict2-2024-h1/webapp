@@ -116,8 +116,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
         </ul>
         <input type="hidden" name="action" value="manage_participants">
     </form>
-    <form action="board.php" method="post" style="text-align: right;">
-        <button type="submit">ログアウト</button>
+    <form action="board.php" method="post">
+            <button type="submit" name="update_btn">掲示板に戻る</button>
+            <input type="hidden" name="post_id" value="<?php echo $post_item['id']; ?>">
     </form>
 </body>
 </html>
