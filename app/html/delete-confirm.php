@@ -20,79 +20,91 @@ if (isset($_POST['delete_btn'])) {
 /**
 * 編集対象の投稿情報を取得
 */
-if (isset($_POST['post_id']) && $_POST['post_id'] != '') {
+    if (isset($_POST['post_id']) && $_POST['post_id'] != '') {
 // セッションに投稿IDを保持
 $_SESSION['id'] = $_POST['post_id'];
-try {
+        try {
 /**
 * DB接続処理
 */
-$pdo = new PDO(DB_HOST, DB_USER, DB_PASSWORD, [
-PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,      // 例外が発生した際にスローする
-]);
+            $pdo = new PDO(DB_HOST, DB_USER, DB_PASSWORD, [
+            PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,      // 例外が発生した際にスローする
+            ]);
 /**
 * 投稿内容登録処理
 */
-$sql = ('
-SELECT id, title, comment
-FROM board_info 
-WHERE id = :ID
-');
-$stmt = $pdo->prepare($sql);
+            $sql = ('
+                SELECT id, title, comment
+                FROM board_info 
+                WHERE id = :ID
+            ');
+            $stmt = $pdo->prepare($sql);
 // プレースホルダーに値をセット
-$stmt->bindValue(':ID', $_SESSION['id'], PDO::PARAM_INT);
+            $stmt->bindValue(':ID', $_SESSION['id'], PDO::PARAM_INT);
 // SQL実行
-$stmt->execute();
+            $stmt->execute();
 // 投稿情報の取得
-$post_info = $stmt->fetch();
-$_SESSION['title'] = $post_info['title'];
-$_SESSION['comment'] = $post_info['comment'];
-} catch (PDOException $e) {
-echo '接続失敗' . $e->getMessage();
-exit();
-}
+            $post_info = $stmt->fetch();
+            $_SESSION['title'] = $post_info['title'];
+            $_SESSION['comment'] = $post_info['comment'];
+        } catch (PDOException $e) {
+            echo '接続失敗' . $e->getMessage();
+            exit();
+        }
 // DBとの接続を切る
-$pdo = null;
-$stmt = null;
-}
+        $pdo = null;
+        $stmt = null;
+    }
 }
 /**
 * 削除ボタンが押下されたときの処理
 */
 if (isset($_POST['delete_submit_btn'])) {
-try {
+    try {
 /**
 * DB接続処理
 */
-$pdo = new PDO(DB_HOST, DB_USER, DB_PASSWORD, [
-PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,      // 例外が発生した際にスローする
-]);
+        $pdo = new PDO(DB_HOST, DB_USER, DB_PASSWORD, [
+            PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,      // 例外が発生した際にスローする
+        ]);
 /**
 * 投稿内容削除処理
 */
-$sql = ('
-DELETE FROM board_info 
-WHERE id = :ID
-');
-$stmt = $pdo->prepare($sql);
+        $sql = ('
+            DELETE FROM board_info 
+            WHERE id = :ID
+        ');
+        $stmt = $pdo->prepare($sql);
 // プレースホルダーに値をセット
-$stmt->bindValue(':ID', $_SESSION['id'], PDO::PARAM_INT);
+        $stmt->bindValue(':ID', $_SESSION['id'], PDO::PARAM_INT);
 // SQL実行
-$stmt->execute();
+        $stmt->execute();
+        
+        $table_name = 'table_' . $_SESSION['id']; // 投稿IDをもとにテーブル名を生成
+        $check_table_sql = "SHOW TABLES LIKE :table_name";
+        $stmt = $pdo->prepare($check_table_sql);
+        $stmt->bindValue(':table_name', $table_name, PDO::PARAM_STR);
+        $stmt->execute();
+        // 削除した投稿IDと同名のテーブルが存在するか確認し、存在すれば削除
+        if ($stmt->rowCount() > 0) { // テーブルが存在する場合
+            $drop_table_sql = "DROP TABLE $table_name";
+            $stmt = $pdo->prepare($drop_table_sql);
+            $stmt->execute();
+        }
 // 削除に成功したらセッション変数を破棄
-unset($_SESSION['id']);
-unset($_SESSION['title']);
-unset($_SESSION['comment']);
+        unset($_SESSION['id']);
+        unset($_SESSION['title']);
+        unset($_SESSION['comment']);
 // 削除成功画面へ遷移
-header('Location: delete-success.php');
-exit();
-} catch (PDOException $e) {
-echo '接続失敗' . $e->getMessage();
-exit();
-}
+        header('Location: delete-success.php');
+        exit();
+    } catch (PDOException $e) {
+        echo '接続失敗' . $e->getMessage();
+        exit();
+    }
 // DBとの接続を切る
-$pdo = null;
-$stmt = null;
+    $pdo = null;
+    $stmt = null;
 }
 /**
 * キャンセルボタンが押下されたら
