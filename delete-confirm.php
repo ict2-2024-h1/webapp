@@ -15,36 +15,36 @@ const DB_HOST = 'mysql:dbname=board;host=127.0.0.1;charset=utf8';
 const DB_USER = 'root';
 const DB_PASSWORD = '';
 /**
- * 削除ボタンで遷移してきたときの処理
- */
+* 削除ボタンで遷移してきたときの処理
+*/
 if (isset($_POST['delete_btn'])) {
-    /**
-     * 編集対象の投稿情報を取得
-     */
+/**
+* 編集対象の投稿情報を取得
+*/
     if (isset($_POST['post_id']) && $_POST['post_id'] != '') {
-        // セッションに投稿IDを保持
-        $_SESSION['id'] = $_POST['post_id'];
+// セッションに投稿IDを保持
+$_SESSION['id'] = $_POST['post_id'];
         try {
-            /**
-             * DB接続処理
-             */
+/**
+* DB接続処理
+*/
             $pdo = new PDO(DB_HOST, DB_USER, DB_PASSWORD, [
-                PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,      // 例外が発生した際にスローする
+            PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,      // 例外が発生した際にスローする
             ]);
-            /**
-             * 投稿内容登録処理
-             */
+/**
+* 投稿内容登録処理
+*/
             $sql = ('
-SELECT id, title, comment
-FROM board_info 
-WHERE id = :ID
-');
+                SELECT id, title, comment
+                FROM board_info 
+                WHERE id = :ID
+            ');
             $stmt = $pdo->prepare($sql);
-            // プレースホルダーに値をセット
+// プレースホルダーに値をセット
             $stmt->bindValue(':ID', $_SESSION['id'], PDO::PARAM_INT);
-            // SQL実行
+// SQL実行
             $stmt->execute();
-            // 投稿情報の取得
+// 投稿情報の取得
             $post_info = $stmt->fetch();
             $_SESSION['title'] = $post_info['title'];
             $_SESSION['comment'] = $post_info['comment'];
@@ -52,94 +52,103 @@ WHERE id = :ID
             echo '接続失敗' . $e->getMessage();
             exit();
         }
-        // DBとの接続を切る
+// DBとの接続を切る
         $pdo = null;
         $stmt = null;
     }
 }
 /**
- * 削除ボタンが押下されたときの処理
- */
+* 削除ボタンが押下されたときの処理
+*/
 if (isset($_POST['delete_submit_btn'])) {
     try {
-        /**
-         * DB接続処理
-         */
+/**
+* DB接続処理
+*/
         $pdo = new PDO(DB_HOST, DB_USER, DB_PASSWORD, [
             PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,      // 例外が発生した際にスローする
         ]);
-        /**
-         * 投稿内容削除処理
-         */
+/**
+* 投稿内容削除処理
+*/
         $sql = ('
-DELETE FROM board_info 
-WHERE id = :ID
-');
+            DELETE FROM board_info 
+            WHERE id = :ID
+        ');
         $stmt = $pdo->prepare($sql);
-        // プレースホルダーに値をセット
+// プレースホルダーに値をセット
         $stmt->bindValue(':ID', $_SESSION['id'], PDO::PARAM_INT);
-        // SQL実行
+// SQL実行
         $stmt->execute();
-        // 削除に成功したらセッション変数を破棄
+        
+        $table_name = 'table_' . $_SESSION['id']; // 投稿IDをもとにテーブル名を生成
+        $check_table_sql = "SHOW TABLES LIKE :table_name";
+        $stmt = $pdo->prepare($check_table_sql);
+        $stmt->bindValue(':table_name', $table_name, PDO::PARAM_STR);
+        $stmt->execute();
+        // 削除した投稿IDと同名のテーブルが存在するか確認し、存在すれば削除
+        if ($stmt->rowCount() > 0) { // テーブルが存在する場合
+            $drop_table_sql = "DROP TABLE $table_name";
+            $stmt = $pdo->prepare($drop_table_sql);
+            $stmt->execute();
+        }
+// 削除に成功したらセッション変数を破棄
         unset($_SESSION['id']);
         unset($_SESSION['title']);
         unset($_SESSION['comment']);
-        // 削除成功画面へ遷移
+// 削除成功画面へ遷移
         header('Location: delete-success.php');
         exit();
     } catch (PDOException $e) {
         echo '接続失敗' . $e->getMessage();
         exit();
     }
-    // DBとの接続を切る
+// DBとの接続を切る
     $pdo = null;
     $stmt = null;
 }
 /**
- * キャンセルボタンが押下されたら
- * セッション情報を破棄して
- * 掲示板一覧画面へ戻る
- */
+* キャンセルボタンが押下されたら
+* セッション情報を破棄して
+* 掲示板一覧画面へ戻る
+*/
 if (isset($_POST['cancel_btn'])) {
-    unset($_SESSION['id']);
-    unset($_SESSION['title']);
-    unset($_SESSION['comment']);
-    header('Location: board.php');
-    return;
+unset($_SESSION['id']);
+unset($_SESSION['title']);
+unset($_SESSION['comment']);
+header('Location: board.php');
+return;
 }
 ?>
 <!DOCTYPE html>
 <html lang="ja">
-
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>掲示板アプリ</title>
-    <link rel="stylesheet" href="./style.css">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>掲示板アプリ</title>
+<link rel="stylesheet" href="./style.css">
 </head>
-
 <body>
-    <h1>削除確認</h1>
-    <p class="delete-confirm-msg">以下の投稿を削除します。</p>
-    <!-- 削除確認画面 -->
-    <section class="post-form">
-        <form action="#" method="post">
-            <div class="post-form__flex">
-                <div>
-                    <p>タイトル</p>
-                    <p><?php if (isset($_SESSION['title'])) echo $_SESSION['title']; ?></p>
-                </div>
-                <div>
-                    <p>投稿内容</p>
-                    <p class="p-pre"><?php if (isset($_SESSION['comment']))  echo $_SESSION['comment']; ?></p>
-                </div>
-            </div>
-            <div class="btn-flex">
-                <button type="submit" name="delete_submit_btn" value="delete_submit_btn">削除</button>
-                <button type="submit" name="cancel_btn" value="cancel_btn">キャンセル</button>
-            </div>
-        </form>
-    </section>
+<h1>削除確認</h1>
+<p class="delete-confirm-msg">以下の投稿を削除します。</p>
+<!-- 削除確認画面 -->
+<section class="post-form">
+<form action="#" method="post">
+<div class="post-form__flex">
+<div>
+<p>タイトル</p>
+<p><?php if (isset($_SESSION['title'])) echo $_SESSION['title']; ?></p>
+</div>
+<div>
+<p>投稿内容</p>
+<p class="p-pre"><?php if (isset($_SESSION['comment']))  echo $_SESSION['comment']; ?></p>
+</div>
+</div>
+<div class="btn-flex">
+<button type="submit" name="delete_submit_btn" value="delete_submit_btn">削除</button>
+<button type="submit" name="cancel_btn" value="cancel_btn">キャンセル</button>
+</div>
+</form>
+</section>
 </body>
-
 </html>
