@@ -9,14 +9,6 @@ ini_set('session.gc_maxlifetime', 1800);
 ini_set('session.gc_divisor', 1);
 session_start();
 
-//<!-- 矢村変更_ログアウトボタン -->
-// ログアウト処理
-// if (isset($_POST['logout_btn'])) {
-//     session_destroy(); // セッションを破棄
-//     header("Location: login.php"); // ログイン画面にリダイレクト
-//     exit();
-// }
-
 /**
  * 投稿者ID（20桁）を生成
  */
@@ -32,6 +24,16 @@ if (isset($_SESSION['cont_id'])) {
         chr(mt_rand(65, 90)) . chr(mt_rand(65, 90)) . chr(mt_rand(65, 90)) .
         chr(mt_rand(65, 90)) . chr(mt_rand(65, 90));
     $cont_id = $_SESSION['cont_id'];
+}
+
+/**
+ * ユーザーの情報を取得
+ */
+$uid = isset($_SESSION['uid']) ? $_SESSION['uid'] : '';
+$user_type = isset($_SESSION['user_type']) ? $_SESSION['user_type'] : ''; // ユーザータイプをセッションから取得
+if (empty($user_type)) {
+    echo "ユーザタイプを未取得";
+    exit;
 }
 /**
  * DB接続情報
@@ -121,11 +123,7 @@ try {
         PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC, // データをカラム名をキーとする連想配列で取得する
         PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,      // 例外が発生した際にスローする
     ]);
-    $sql = ('
-SELECT * 
-FROM board_info 
-ORDER BY id DESC
-');
+    $sql = ('SELECT * FROM board_info ORDER BY id DESC');
     $stmt = $pdo->prepare($sql);
     // SQL実行
     $stmt->execute();
@@ -149,39 +147,55 @@ ORDER BY id DESC
 <body>
     <h1>掲示板アプリ</h1>
 
-    <!-- 矢村変更_ログアウトボタンを追加 -->
+    <!-- ログアウトボタンを追加 -->
     <form action="logout.php" method="post" style="text-align: right;">
-        <button type="submit">ログアウト</button>
+        <button type="submit" class="logout_btn">ログアウト</button>
     </form>
 
-    <!-- 投稿フォーム -->
-    <section class="post-form">
-        <form action="#" method="post">
-            <div class="post-form__flex">
-                <div>
-                    <label>
-                        <p>タイトル（※最大30文字）</p>
-                        <input type="text" name="post_title" value="<?php if (isset($_SESSION['title'])) echo $_SESSION['title']; ?>">
-                        <!-- エラーメッセージ -->
-                        <?php if (isset($err_msg_title)) {
-                            echo "<p class='err'>{$err_msg_title}</p>";
-                        } ?>
-                    </label>
-                </div>
-                <div>
-                    <label>
-                        <p>投稿内容（※最大1000文字）</p>
-                        <textarea name="post_comment" cols="50" rows="10"><?php if (isset($_SESSION['comment'])) echo $_SESSION['comment']; ?></textarea>
-                        <!-- エラーメッセージ -->
-                        <?php if (isset($err_msg_comment)) {
-                            echo "<p class='err'>{$err_msg_comment}</p>";
-                        } ?>
-                    </label>
-                </div>
-            </div>
-            <button class="btn--mg-c" type="submit" name="post_btn" value="post_btn">投稿</button>
-        </form>
+    <!-- ユーザータイプに応じた内容 -->
+    <section>
+        <?php if ($user_type === 'student'): ?>
+            <h2>学生用掲示板</h2>
+            <p>学生用の投稿を表示します。投稿・編集・削除が可能です。</p>
+        <?php elseif ($user_type === 'company'): ?>
+            <h2>企業用掲示板</h2>
+            <p>企業用の投稿を表示します。情報の閲覧のみ可能です。</p>
+        <?php else: ?>
+            <h2>不明なユーザータイプ</h2>
+            <p>適切なユーザータイプでログインしてください。</p> <!-- 不明なユーザータイプの場合の明確なメッセージ -->
+        <?php endif; ?>
     </section>
+
+    <?php if ($user_type === 'student') : ?>
+        <!-- 投稿フォーム -->
+        <section class="post-form">
+            <form action="#" method="post">
+                <div class="post-form__flex">
+                    <div>
+                        <label>
+                            <p>タイトル（※最大30文字）</p>
+                            <input type="text" name="post_title" value="<?php if (isset($_SESSION['title'])) echo $_SESSION['title']; ?>">
+                            <!-- エラーメッセージ -->
+                            <?php if (isset($err_msg_title)) {
+                                echo "<p class='err'>{$err_msg_title}</p>";
+                            } ?>
+                        </label>
+                    </div>
+                    <div>
+                        <label>
+                            <p>投稿内容（※最大1000文字）</p>
+                            <textarea name="post_comment" cols="50" rows="10"><?php if (isset($_SESSION['comment'])) echo $_SESSION['comment']; ?></textarea>
+                            <!-- エラーメッセージ -->
+                            <?php if (isset($err_msg_comment)) {
+                                echo "<p class='err'>{$err_msg_comment}</p>";
+                            } ?>
+                        </label>
+                    </div>
+                </div>
+                <button class="btn--mg-c" type="submit" name="post_btn" value="post_btn">投稿</button>
+            </form>
+        </section>
+    <?php endif; ?>
     <hr>
     <!-- 投稿一覧 -->
     <section class="post-list">

@@ -4,15 +4,16 @@ require_once("dbconnect.php");
 // $pass=$_POST['pass'];
 $email = isset($_POST['email']) ? $_POST['email'] : '';
 $pass = isset($_POST['pass']) ? $_POST['pass'] : '';
+$user_type = isset($_POST['user_type']) ? $_POST['user_type'] : '';
 
 
-$sql = "SELECT UID, Pass FROM Account " . " WHERE Email=:email";
+$sql = "SELECT UID, Pass, User_type FROM Account " . " WHERE Email=:email";
 try {
 	$stmt = $dbcon->prepare($sql);
 	$stmt->bindParam(':email', $email);
 	$stmt->execute();
 	$tmp = $stmt->fetch(PDO::FETCH_ASSOC);
-	if ($stmt->rowCount() == 0 || $pass != $tmp['Pass']) {
+	if ($stmt->rowCount() == 0 || $pass != $tmp['Pass'] || $user_type != $tmp['user_type']) {
 		echo <<<EOD
 		<html>
 		<head><title>ERROR</title></head>
@@ -26,8 +27,11 @@ try {
 		exit;
 	} else {
 		$uid = $tmp['UID'];
+		$user_type = $tmp['User_type'];
 		session_start();
 		$_SESSION['uid'] = $uid;
+		$_SESSION['user_type'] = $user_type;
+
 		header("Location: board.php");
 		exit();
 	}

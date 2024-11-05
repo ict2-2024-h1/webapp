@@ -16,19 +16,44 @@ require_once("dbconnect.php");
     $email  = $_POST['email'];
     $pass = $_POST['pass'];
     $name = $_POST['name'];
-
-    $sql = "INSERT INTO Account" . "(Email, Pass, Name)" . "VALUES (:email, :pass, :name)";
-    //echo $sql;
+    $user_type = $_POST['user_type']; // ユーザータイプを取得
 
     try {
+        do {
+            $uid =
+                chr(mt_rand(65, 90)) . chr(mt_rand(65, 90)) . chr(mt_rand(65, 90)) .
+                chr(mt_rand(65, 90)) . chr(mt_rand(65, 90)) . chr(mt_rand(65, 90)) .
+                chr(mt_rand(65, 90)) . chr(mt_rand(65, 90)) . chr(mt_rand(65, 90)) .
+                chr(mt_rand(65, 90)) . chr(mt_rand(65, 90)) . chr(mt_rand(65, 90)) .
+                chr(mt_rand(65, 90)) . chr(mt_rand(65, 90)) . chr(mt_rand(65, 90)) .
+                chr(mt_rand(65, 90)) . chr(mt_rand(65, 90)) . chr(mt_rand(65, 90)) .
+                chr(mt_rand(65, 90)) . chr(mt_rand(65, 90));
+            session_start();
+
+            // データベースで確認
+            $sql = "SELECT COUNT(*) FROM Account WHERE UID = :uid"; // UIDを確認
+            $stmt = $dbcon->prepare($sql);
+            $stmt->bindParam(':uid', $uid);
+            $stmt->execute();
+
+            // すでに存在するか確認
+            $exists = $stmt->fetchColumn();
+        } while ($exists > 0); // 存在する場合、再度生成
+
+        $sql = "INSERT INTO Account" . "(UID ,Email, Pass, Name, User_type)" . "VALUES (:uid, :email, :pass, :name, :user_type)";
+        //echo $sql;
+
+
         $stmt = $dbcon->prepare($sql);
+        $stmt->bindParam(':uid', $uid);
         $stmt->bindParam(':email', $email);
         $stmt->bindParam(':pass', $pass);
         $stmt->bindParam(':name', $name);
+        $stmt->bindParam(':user_type', $user_type);
         $stmt->execute();
         echo "登録が完了しました。<br/>";
     } catch (PDOException $e) {
-        echo "そのメールアドレスは登録済みです。<br/>";
+        echo "エラー: " . $e->getMessage() . "<br/>";
     }
 
     ?>
