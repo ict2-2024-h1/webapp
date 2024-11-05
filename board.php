@@ -10,37 +10,71 @@ ini_set('session.gc_divisor', 1);
 session_start();
 
 /**
- * 投稿者ID（20桁）を生成
- */
-if (isset($_SESSION['cont_id'])) {
-    $cont_id = $_SESSION['cont_id'];
-} else {
-    $_SESSION['cont_id'] =
-        chr(mt_rand(65, 90)) . chr(mt_rand(65, 90)) . chr(mt_rand(65, 90)) .
-        chr(mt_rand(65, 90)) . chr(mt_rand(65, 90)) . chr(mt_rand(65, 90)) .
-        chr(mt_rand(65, 90)) . chr(mt_rand(65, 90)) . chr(mt_rand(65, 90)) .
-        chr(mt_rand(65, 90)) . chr(mt_rand(65, 90)) . chr(mt_rand(65, 90)) .
-        chr(mt_rand(65, 90)) . chr(mt_rand(65, 90)) . chr(mt_rand(65, 90)) .
-        chr(mt_rand(65, 90)) . chr(mt_rand(65, 90)) . chr(mt_rand(65, 90)) .
-        chr(mt_rand(65, 90)) . chr(mt_rand(65, 90));
-    $cont_id = $_SESSION['cont_id'];
-}
+* DB接続情報
+*/
+const DB_HOST = 'mysql:dbname=board;host=127.0.0.1;charset=utf8';
+const DB_USER = 'root';
+const DB_PASSWORD = '';
 
 /**
- * ユーザーの情報を取得
- */
-$uid = isset($_SESSION['uid']) ? $_SESSION['uid'] : '';
+* ID取得処理
+*/
+
+$uid=$_SESSION['uid'];// 追加 ID値を渡す
+$_SESSION['uid'] = $uid;
 $user_type = isset($_SESSION['user_type']) ? $_SESSION['user_type'] : ''; // ユーザータイプをセッションから取得
 if (empty($user_type)) {
     echo "ユーザタイプを未取得";
     exit;
 }
+
+try {
+    /**
+    * DB接続処理
+    */
+    $pdo = new PDO(DB_HOST, DB_USER, DB_PASSWORD, [
+    PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC, // データをカラム名をキーとする連想配列で取得する
+    PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,      // 例外が発生した際にスローする
+    ]);
+    $sql = ('
+    SELECT UserName 
+    FROM  account
+    WHERE UID = :uid
+    ');
+    $stmt = $pdo->prepare($sql);
+    
+    // プレースホルダに検索するのuid値をバインド
+    $stmt->bindParam(':uid', $uid);
+    
+    // SQL実行
+    $stmt->execute();
+    
+    // 検索結果を取得
+    $result = $stmt->fetch(PDO::FETCH_ASSOC);
+    $username = $result['UserName'];
+
+    if ($result) {
+        echo 'ログイン中ユーザー: ' . $result['UserName'];
+    } else {
+        echo '指定されたUIDは見つかりませんでした。';
+    }
+    
+
+} catch (PDOException $e) {
+    echo '接続失敗' . $e->getMessage();
+    exit();
+}
+
 /**
- * DB接続情報
- */
-const DB_HOST = 'mysql:dbname=board;host=127.0.0.1;charset=utf8';
-const DB_USER = 'root';
-const DB_PASSWORD = '';
+* 投稿者ID（20桁）を生成
+*/
+if (isset($_SESSION['cont_id'])) {
+$cont_id = $uid;
+} else {
+$_SESSION['cont_id'] = $uid;
+$cont_id = $uid;
+}
+
 /**
  * 投稿ボタンが押下されたときの処理
  */
@@ -48,11 +82,11 @@ if (isset($_POST['post_btn'])) {
     // 更新操作用の処理
     unset($_SESSION['id']);
     /**
-     * セッション変数に情報を保存して
-     * タイトルまたは投稿内容の片方だけが
-     * 入力されていた場合、
-     * 入力フォームに内容を保持する
-     */
+    * セッション変数に情報を保存して
+    * タイトルまたは投稿内容の片方だけが
+    * 入力されていた場合、
+    * 入力フォームに内容を保持する
+    */
     if (isset($_POST['post_title']) && $_POST['post_title'] != '') {
         $_SESSION['title'] = $_POST['post_title'];
     } else {
@@ -64,40 +98,41 @@ if (isset($_POST['post_btn'])) {
         unset($_SESSION['comment']);
     }
     /**
-     * エラーメッセージ格納
-     */
+    * エラーメッセージ格納
+    */
     if ($_POST['post_title'] == '') $err_msg_title  = '※タイトルを入力して下さい';
     if ($_POST['post_comment'] == '') $err_msg_comment  = '※投稿内容を入力して下さい';
     /**
-     * 必要項目がすべて入力されてたら投稿処理を実行
-     */
+    * 必要項目がすべて入力されてたら投稿処理を実行
+    */
     if (
-        isset($_POST['post_title']) && $_POST['post_title'] != '' &&
-        isset($_POST['post_comment']) && $_POST['post_comment'] != ''
+    isset($_POST['post_title']) && $_POST['post_title'] != '' &&
+    isset($_POST['post_comment']) && $_POST['post_comment'] != ''
     ) {
         $title = $_POST['post_title'];
         $comment = $_POST['post_comment'];
         try {
             /**
-             * DB接続処理
-             */
+            * DB接続処理
+            */
             $pdo = new PDO(DB_HOST, DB_USER, DB_PASSWORD, [
-                PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,      // 例外が発生した際にスローする
+            PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,      // 例外が発生した際にスローする
             ]);
             /**
-             * 投稿内容登録処理
-             */
+            * 投稿内容登録処理
+            */
             $sql = ('
-INSERT INTO
-board_info (title, comment, contributor_id)
-VALUES
-(:TITLE, :COMMENT, :CONTRIBUTOR_ID)
-');
+            INSERT INTO
+            board_info (title, comment, contributor_id, contributor_username)
+            VALUES
+            (:TITLE, :COMMENT, :CONTRIBUTOR_ID, :CONTRIBUTOR_USERNAME)
+            ');
             $stmt = $pdo->prepare($sql);
             // プレースホルダーに値をセット
             $stmt->bindValue(':TITLE', $title, PDO::PARAM_STR);
             $stmt->bindValue(':COMMENT', $comment, PDO::PARAM_STR);
             $stmt->bindValue(':CONTRIBUTOR_ID', $cont_id, PDO::PARAM_STR);
+            $stmt->bindValue(':CONTRIBUTOR_USERNAME', $username, PDO::PARAM_STR);
             // SQL実行
             $stmt->execute();
             // 投稿に成功したらセッション変数を破棄
@@ -117,13 +152,17 @@ VALUES
  */
 try {
     /**
-     * DB接続処理
-     */
+    * DB接続処理
+    */
     $pdo = new PDO(DB_HOST, DB_USER, DB_PASSWORD, [
-        PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC, // データをカラム名をキーとする連想配列で取得する
-        PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,      // 例外が発生した際にスローする
+    PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC, // データをカラム名をキーとする連想配列で取得する
+    PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,      // 例外が発生した際にスローする
     ]);
-    $sql = ('SELECT * FROM board_info ORDER BY id DESC');
+    $sql = ('
+    SELECT * 
+    FROM board_info 
+    ORDER BY id DESC
+    ');
     $stmt = $pdo->prepare($sql);
     // SQL実行
     $stmt->execute();
@@ -146,7 +185,9 @@ try {
 
 <body>
     <h1>掲示板アプリ</h1>
-
+    <div style="text-align: right;">
+        <a href="mypage.php" class="btn">マイページ</a>
+    </div>
     <!-- ログアウトボタンを追加 -->
     <form action="logout.php" method="post" style="text-align: right;">
         <button type="submit" class="logout_btn">ログアウト</button>
@@ -196,54 +237,54 @@ try {
             </form>
         </section>
     <?php endif; ?>
-    <hr>
-    <!-- 投稿一覧 -->
-    <section class="post-list">
-        <?php if (count($post_list) === 0) : ?>
-            <!-- 投稿が無いときはメッセージを表示する -->
-            <p class="no-post-msg">現在、投稿はありません。</p>
-        <?php else : ?>
-            <ul>
-                <!-- 投稿情報の出力 -->
-                <?php foreach ($post_list as $post_item) : ?>
-                    <li>
-                        <form action="" method="post">
-                            <!-- 投稿ID -->
-                            <span>ID：<?php echo $post_item['id']; ?>　</span>
-                            <!-- 投稿タイトル -->
-                            <span><?php echo $post_item['title']; ?></span>
-                            <!-- 投稿者ID -->
-                            <span>／投稿者 ：<?php echo $post_item['contributor_id']; ?></span>
-                            <!-- 投稿内容 -->
-                            <p class="p-pre"><?php echo $post_item['comment']; ?></p>
-                            <!-- 投稿日時 -->
-                            <span class="post-datetime">投稿日時：<?php echo $post_item['created_at']; ?></span>
-                            <!-- 過去に更新されていたら更新日時も表示 -->
-                            <?php if ($post_item['created_at'] < $post_item['updated_at']) : ?>
-                                <span class="post-datetime post-datetime__updated">更新日時：<?php echo $post_item['updated_at']; ?></span>
-                            <?php endif; ?>
-                        </form>
-                        <!-- 自分の投稿内容かつセッションが有効な間は編集・削除が可能 -->
-                        <?php if ($post_item['contributor_id'] === $cont_id) : ?>
-                            <div class="btn-flex">
-                                <form action="update-edit.php" method="post">
-                                    <button type="submit" name="update_btn">編集</button>
-                                    <input type="hidden" name="post_id" value="<?php echo $post_item['id']; ?>">
-                                </form>
-                                <form action="delete-confirm.php" method="post">
-                                    <button type="submit" name="delete_btn">削除</button>
-                                    <input type="hidden" name="post_id" value="<?php echo $post_item['id']; ?>">
-                                </form>
-                            </div>
-                        <?php endif; ?>
-                        <?php if (isset($_SESSION['id']) && ($_SESSION['id'] == $post_item['id'])): ?>
-                            <p class='updated-post'>更新しました</p>
-                        <?php endif; ?>
-                    </li>
-                <?php endforeach; ?>
-            </ul>
-        <?php endif; ?>
-    </section>
+<hr>
+<!-- 投稿一覧 -->
+<section class="post-list">
+<?php if (count($post_list) === 0) : ?>
+<!-- 投稿が無いときはメッセージを表示する -->
+<p class="no-post-msg">現在、投稿はありません。</p>
+<?php else : ?>
+<ul>
+<!-- 投稿情報の出力 -->
+<?php foreach ($post_list as $post_item) : ?>
+<li>
+<form action="" method="post">
+<!-- 投稿ID -->
+<span>ID：<?php echo $post_item['id']; ?>　</span>
+<!-- 投稿タイトル -->
+<span><?php echo $post_item['title']; ?></span>
+<!-- 投稿者ID -->
+<span>／投稿者：<?php echo isset($post_item['contributor_username']) ? $post_item['contributor_username'] : '不明なユーザー'; ?></span>
+<!-- 投稿内容 -->
+<p class="p-pre"><?php echo $post_item['comment']; ?></p>
+<!-- 投稿日時 -->
+<span class="post-datetime">投稿日時：<?php echo $post_item['created_at']; ?></span>
+<!-- 過去に更新されていたら更新日時も表示 -->
+<?php if ($post_item['created_at'] < $post_item['updated_at']) : ?>
+<span class="post-datetime post-datetime__updated">更新日時：<?php echo $post_item['updated_at']; ?></span>
+<?php endif; ?>
+</form>
+<!-- 自分の投稿内容かつセッションが有効な間は編集・削除が可能 -->
+<?php if ($post_item['contributor_id'] === $cont_id) : ?>
+<div class="btn-flex">
+<form action="update-edit.php" method="post">
+<button type="submit" name="update_btn">編集</button>
+<input type="hidden" name="post_id" value="<?php echo $post_item['id']; ?>">
+</form>
+<form action="delete-confirm.php" method="post">
+<button type="submit" name="delete_btn">削除</button>
+<input type="hidden" name="post_id" value="<?php echo $post_item['id']; ?>">
+</form>
+</div>
+<?php endif; ?>
+<?php if (isset($_SESSION['id']) && ($_SESSION['id'] == $post_item['id'])): ?>
+<p class='updated-post'>更新しました</p>
+<?php endif; ?>
+</li>
+<?php endforeach; ?>
+</ul>
+<?php endif; ?>
+</section>
 </body>
 
 </html>

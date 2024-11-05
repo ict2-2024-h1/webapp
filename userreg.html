@@ -2,24 +2,130 @@
 <html lang="ja">
 
 <head>
-	<meta charset="UTF-8">
-	<title>User Reg. Form</title>
+    <meta charset="UTF-8">
+    <title>User Reg. Form</title>
+    <link rel="stylesheet" type="text/css" href="style.css"> <!-- CSSファイルのリンク -->
+	<style>
+		body {
+			margin: 0 auto;
+			width: 700px;
+			background-color: rgb(224, 224, 224);
+		}
+
+		h1 {
+			text-align: center;
+			color: #333;
+		}
+
+		.form-group {
+			margin-bottom: 15px;
+		}
+
+		label {
+			display: block;
+			margin-bottom: 5px;
+			color: #333;
+		}
+
+		input {
+			padding: 10px;
+			border: 1px solid gray;
+			border-radius: 10px;
+			width: 100%;
+			box-sizing: border-box;
+		}
+
+		input[type="text"],
+		input[type="email"],
+		input[type="tel"],
+		input[type="date"],
+		input[type="password"] {
+			background-color: #fff; /* 背景色を白に設定 */
+			color: #333; /* テキスト色をダークグレーに設定 */
+		}
+
+		input[type="submit"] {
+			background-color: rgb(94, 94, 255);
+			color: #fff;
+			border: 1px solid rgb(148, 148, 218);
+			border-radius: 10px;
+			cursor: pointer;
+			padding: 10px;
+			margin-top: 10px; /* ボタンとフィールドの間にマージンを追加 */
+		}
+
+		input[type="submit"]:hover {
+			background-color: rgb(116, 116, 255);
+		}
+
+		a {
+			display: inline-block;
+			margin-top: 10px;
+			text-align: center;
+			color: rgb(94, 94, 255); /* リンクの色をボタンに合わせる */
+		}
+
+		a:hover {
+			text-decoration: underline; /* ホバー時に下線を追加 */
+		}
+</style>
+
 </head>
 
 <body>
-	<h1>SIGN UP</h1>
-	<form action="userreg.php" method="POST">
-		email:<input type="text" name="email"><br />
-		password:<input type="password" name="pass"><br />
-		username:<input type="text" name="name"><br />
+    <h1>ユーザー登録</h1>
+    <form action="userreg.php" method="POST">
+        <div class="form-group">
+            <label for="last_name">姓:</label>
+            <input type="text" name="last_name" required>
+        </div>
 
+        <div class="form-group">
+            <label for="last_name_kana">姓カナ:</label>
+            <input type="text" name="last_name_kana" required>
+        </div>
+
+        <div class="form-group">
+            <label for="first_name">名:</label>
+            <input type="text" name="first_name" required>
+        </div>
+
+        <div class="form-group">
+            <label for="first_name_kana">名カナ:</label>
+            <input type="text" name="first_name_kana" required>
+        </div>
+
+        <div class="form-group">
+            <label for="birthdate">生年月日:</label>
+            <input type="date" name="birthdate" required>
+        </div>
+
+        <div class="form-group">
+            <label for="phone">電話番号:</label>
+            <input type="tel" name="phone" required>
+        </div>
+
+        <div class="form-group">
+            <label for="email">メールアドレス:</label>
+            <input type="email" name="email" required>
+        </div>
+
+        <div class="form-group">
+            <label for="username">ユーザーネーム:</label>
+            <input type="text" name="username" required>
+        </div>
+
+        <div class="form-group">
+            <label for="pass">パスワード:</label>
+            <input type="password" name="pass" required>
+        </div>
 		<!-- 学生と企業を選択するラジオボタン -->
         <label><input type="radio" name="user_type" value="student" checked> 学生</label>
         <label><input type="radio" name="user_type" value="company"> 企業</label><br />
 
-		<input type="submit" value="sign up"><br />
-		<a href="index.html">[login]</a>
-	</form>
+        <input type="submit" value="登録"><br/>
+        <a href="index.html">[ログイン]</a>
+    </form>
 </body>
 
 </html>

@@ -2,17 +2,90 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>login form</title>
+    <title>掲示板アプリ - ログイン</title>
+    <link rel="stylesheet" type="text/css" href="style.css"> <!-- CSSファイルのリンク -->
+    <style>
+        /* 全体の背景とレイアウト */
+        body {
+            margin: 0 auto;
+            width: 700px;
+            background-color: rgb(224, 224, 224);
+            font-family: Arial, sans-serif;
+            background-image: radial-gradient(circle, rgba(255, 255, 255, 0.3) 20%, rgba(224, 224, 224, 0) 20%); /* 背景模様 */
+            background-size: 20px 20px; /* パターンのサイズ */
+        }
+
+        .login-container {
+            background-color: #fff; /* 背景色を白に */
+            border-radius: 10px;
+            padding: 20px;
+            max-width: 400px;
+            margin: 50px auto;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+
+        label {
+            display: block;
+            margin: 10px 0 5px;
+        }
+
+        input[type="text"], input[type="password"] {
+            padding: 10px;
+            border: 1px solid gray;
+            border-radius: 10px;
+            width: calc(100% - 20px);
+            box-sizing: border-box;
+            margin-bottom: 15px;
+        }
+
+        input[type="submit"] {
+            display: block;
+            margin-top: 20px;
+            padding: 10px 30px;
+            color: #fff;
+            border-radius: 10px;
+            cursor: pointer;
+            border: 1px solid rgb(148, 148, 218);
+            background-color: rgb(94, 94, 255);
+            width: 100%;
+        }
+
+        input[type="submit"]:hover {
+            background-color: rgb(116, 116, 255);
+        }
+
+        a {
+            display: block;
+            text-align: center;
+            margin-top: 15px;
+            color: rgb(94, 94, 255);
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+    </style>
 </head>
 
 <body>
-    <h1>LOGIN</h1>
-    <form action="login.php" method="POST">
-        email:<input type="text" name="email"><br />
-        password:<input type="password" name="pass"><br />  
-        <input type="submit" value="login"><br />
-        <a href="userreg.html">[sign up]</a>
-    </form>
+    <div class="login-container">
+        <h1>開発経験掲示板アプリ</h1> <!-- サービス名を追加 -->
+        <form action="login.php" method="POST">
+            <label for="username">ユーザーネーム:</label>
+            <input type="text" name="username" required>
+    
+            <label for="pass">パスワード:</label>
+            <input type="password" name="pass" required>
+    
+            <input type="submit" value="ログイン">
+            <a href="userreg.html">[新規登録]</a>
+        </form>
+    </div>
 </body>
 
 </html>
