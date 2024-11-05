@@ -4,126 +4,163 @@
 * セッションの保存期間を1800秒に指定　※任意の秒数へ変更可能
 * かつ、確実に破棄する
 */
-ini_set('session.gc_maxlifetime', 1800);
-ini_set('session.gc_divisor', 1);
 session_start();
-/**
-* 投稿者ID（20桁）を生成
-*/
-if (isset($_SESSION['cont_id'])) {
-$cont_id = $_SESSION['cont_id'];
-} else {
-$_SESSION['cont_id'] = 
-chr(mt_rand(65, 90)) . chr(mt_rand(65, 90)) . chr(mt_rand(65, 90)) .
-chr(mt_rand(65, 90)) . chr(mt_rand(65, 90)) . chr(mt_rand(65, 90)) . 
-chr(mt_rand(65, 90)) . chr(mt_rand(65, 90)) . chr(mt_rand(65, 90)) . 
-chr(mt_rand(65, 90)) . chr(mt_rand(65, 90)) . chr(mt_rand(65, 90)) . 
-chr(mt_rand(65, 90)) . chr(mt_rand(65, 90)) . chr(mt_rand(65, 90)) . 
-chr(mt_rand(65, 90)) . chr(mt_rand(65, 90)) . chr(mt_rand(65, 90)) . 
-chr(mt_rand(65, 90)) . chr(mt_rand(65, 90));
-$cont_id = $_SESSION['cont_id'];
-}
 /**
 * DB接続情報
 */
 const DB_HOST = 'mysql:dbname=board;host=127.0.0.1;charset=utf8';
 const DB_USER = 'root';
 const DB_PASSWORD = '';
+
+/**
+* ID取得処理
+*/
+
+$uid=$_SESSION['uid'];// 追加 ID値を渡す
+$_SESSION['uid'] = $uid;
+try {
+    /**
+    * DB接続処理
+    */
+    $pdo = new PDO(DB_HOST, DB_USER, DB_PASSWORD, [
+    PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC, // データをカラム名をキーとする連想配列で取得する
+    PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,      // 例外が発生した際にスローする
+    ]);
+    $sql = ('
+    SELECT UserName 
+    FROM  account
+    WHERE UID = :uid
+    ');
+    $stmt = $pdo->prepare($sql);
+    
+    // プレースホルダに検索するのuid値をバインド
+    $stmt->bindParam(':uid', $uid);
+    
+    // SQL実行
+    $stmt->execute();
+    
+    // 検索結果を取得
+    $result = $stmt->fetch(PDO::FETCH_ASSOC);
+    $username = $result['UserName'];
+
+    if ($result) {
+        echo 'ログイン中ユーザー: ' . $result['UserName'];
+    } else {
+        echo '指定されたUIDは見つかりませんでした。';
+    }
+    
+
+} catch (PDOException $e) {
+    echo '接続失敗' . $e->getMessage();
+    exit();
+}
+
+/**
+* 投稿者ID（20桁）を生成
+*/
+if (isset($_SESSION['cont_id'])) {
+$cont_id = $uid;
+} else {
+$_SESSION['cont_id'] = $uid;
+$cont_id = $uid;
+}
+
 /**
 * 投稿ボタンが押下されたときの処理
 */
 if (isset($_POST['post_btn'])) {
-// 更新操作用の処理
-unset($_SESSION['id']);
-/**
-* セッション変数に情報を保存して
-* タイトルまたは投稿内容の片方だけが
-* 入力されていた場合、
-* 入力フォームに内容を保持する
-*/
-if (isset($_POST['post_title']) && $_POST['post_title'] != '') {
-$_SESSION['title'] = $_POST['post_title'];
-} else {
-unset($_SESSION['title']);
-}
-if (isset($_POST['post_comment']) && $_POST['post_comment'] != '') {
-$_SESSION['comment'] = $_POST['post_comment'];
-} else {
-unset($_SESSION['comment']);
-}
-/**
-* エラーメッセージ格納
-*/
-if ($_POST['post_title'] == '') $err_msg_title  = '※タイトルを入力して下さい';
-if ($_POST['post_comment'] == '') $err_msg_comment  = '※投稿内容を入力して下さい';
-/**
-* 必要項目がすべて入力されてたら投稿処理を実行
-*/
-if (
-isset($_POST['post_title']) && $_POST['post_title'] != '' &&
-isset($_POST['post_comment']) && $_POST['post_comment'] != ''
-) {
-$title = $_POST['post_title'];
-$comment = $_POST['post_comment'];
-try {
-/**
-* DB接続処理
-*/
-$pdo = new PDO(DB_HOST, DB_USER, DB_PASSWORD, [
-PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,      // 例外が発生した際にスローする
-]);
-/**
-* 投稿内容登録処理
-*/
-$sql = ('
-INSERT INTO
-board_info (title, comment, contributor_id)
-VALUES
-(:TITLE, :COMMENT, :CONTRIBUTOR_ID)
-');
-$stmt = $pdo->prepare($sql);
-// プレースホルダーに値をセット
-$stmt->bindValue(':TITLE', $title, PDO::PARAM_STR);
-$stmt->bindValue(':COMMENT', $comment, PDO::PARAM_STR);
-$stmt->bindValue(':CONTRIBUTOR_ID', $cont_id, PDO::PARAM_STR);
-// SQL実行
-$stmt->execute();
-// 投稿に成功したらセッション変数を破棄
-unset($_SESSION['title']);
-unset($_SESSION['comment']);
-} catch (PDOException $e) {
-echo '接続失敗' . $e->getMessage();
-exit();
-}
-// DBとの接続を切る
-$pdo = null;
-$stmt = null;
-}
+    // 更新操作用の処理
+    unset($_SESSION['id']);
+    /**
+    * セッション変数に情報を保存して
+    * タイトルまたは投稿内容の片方だけが
+    * 入力されていた場合、
+    * 入力フォームに内容を保持する
+    */
+    if (isset($_POST['post_title']) && $_POST['post_title'] != '') {
+        $_SESSION['title'] = $_POST['post_title'];
+    } else {
+        unset($_SESSION['title']);
+    }
+    if (isset($_POST['post_comment']) && $_POST['post_comment'] != '') {
+        $_SESSION['comment'] = $_POST['post_comment'];
+    } else {
+        unset($_SESSION['comment']);
+    }
+    /**
+    * エラーメッセージ格納
+    */
+    if ($_POST['post_title'] == '') $err_msg_title  = '※タイトルを入力して下さい';
+    if ($_POST['post_comment'] == '') $err_msg_comment  = '※投稿内容を入力して下さい';
+    /**
+    * 必要項目がすべて入力されてたら投稿処理を実行
+    */
+    if (
+    isset($_POST['post_title']) && $_POST['post_title'] != '' &&
+    isset($_POST['post_comment']) && $_POST['post_comment'] != ''
+    ) {
+        $title = $_POST['post_title'];
+        $comment = $_POST['post_comment'];
+        try {
+            /**
+            * DB接続処理
+            */
+            $pdo = new PDO(DB_HOST, DB_USER, DB_PASSWORD, [
+            PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,      // 例外が発生した際にスローする
+            ]);
+            /**
+            * 投稿内容登録処理
+            */
+            $sql = ('
+            INSERT INTO
+            board_info (title, comment, contributor_id, contributor_username)
+            VALUES
+            (:TITLE, :COMMENT, :CONTRIBUTOR_ID, :CONTRIBUTOR_USERNAME)
+            ');
+            $stmt = $pdo->prepare($sql);
+            // プレースホルダーに値をセット
+            $stmt->bindValue(':TITLE', $title, PDO::PARAM_STR);
+            $stmt->bindValue(':COMMENT', $comment, PDO::PARAM_STR);
+            $stmt->bindValue(':CONTRIBUTOR_ID', $cont_id, PDO::PARAM_STR);
+            $stmt->bindValue(':CONTRIBUTOR_USERNAME', $username, PDO::PARAM_STR);
+            // SQL実行
+            $stmt->execute();
+            // 投稿に成功したらセッション変数を破棄
+            unset($_SESSION['title']);
+            unset($_SESSION['comment']);
+        } catch (PDOException $e) {
+            echo '接続失敗' . $e->getMessage();
+            exit();
+        }
+        // DBとの接続を切る
+        $pdo = null;
+        $stmt = null;
+    }
 }
 /**
 * 投稿一覧取得処理
 */
 try {
-/**
-* DB接続処理
-*/
-$pdo = new PDO(DB_HOST, DB_USER, DB_PASSWORD, [
-PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC, // データをカラム名をキーとする連想配列で取得する
-PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,      // 例外が発生した際にスローする
-]);
-$sql = ('
-SELECT * 
-FROM board_info 
-ORDER BY id DESC
-');
-$stmt = $pdo->prepare($sql);
-// SQL実行
-$stmt->execute();
-// 投稿情報を辞書形式ですべて取得
-$post_list = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    /**
+    * DB接続処理
+    */
+    $pdo = new PDO(DB_HOST, DB_USER, DB_PASSWORD, [
+    PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC, // データをカラム名をキーとする連想配列で取得する
+    PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,      // 例外が発生した際にスローする
+    ]);
+    $sql = ('
+    SELECT * 
+    FROM board_info 
+    ORDER BY id DESC
+    ');
+    $stmt = $pdo->prepare($sql);
+    // SQL実行
+    $stmt->execute();
+    // 投稿情報を辞書形式ですべて取得
+    $post_list = $stmt->fetchAll(PDO::FETCH_ASSOC);
 } catch (PDOException $e) {
-echo '接続失敗' . $e->getMessage();
-exit();
+    echo '接続失敗' . $e->getMessage();
+    exit();
 }
 ?>
 <!DOCTYPE html>
@@ -136,6 +173,11 @@ exit();
 </head>
 <body>
 <h1>掲示板アプリ</h1>
+
+<div style="text-align: right;">
+    <a href="mypage.php" class="btn">マイページ</a>
+</div>
+
 <!-- 投稿フォーム -->
 <section class="post-form">
 <form action="#" method="post">
@@ -181,7 +223,7 @@ echo "<p class='err'>{$err_msg_comment}</p>";
 <!-- 投稿タイトル -->
 <span><?php echo $post_item['title']; ?></span>
 <!-- 投稿者ID -->
-<span>／投稿者：<?php echo $post_item['contributor_id']; ?></span>
+<span>／投稿者：<?php echo $post_item['contributor_username']; ?></span>
 <!-- 投稿内容 -->
 <p class="p-pre"><?php echo $post_item['comment']; ?></p>
 <!-- 投稿日時 -->

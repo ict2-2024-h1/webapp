@@ -4,6 +4,8 @@ body {
     width: 700px;
     background-color: rgb(224, 224, 224);
     font-family: Arial, sans-serif;
+    background-image: radial-gradient(circle, rgba(255, 255, 255, 0.3) 20%, rgba(224, 224, 224, 0) 20%); /* 背景模様 */
+    background-size: 20px 20px; /* パターンのサイズ */
 }
 
 hr {
@@ -48,6 +50,7 @@ button {
     color: #fff;
     border-radius: 10px;
     cursor: pointer;
+    width: 100%; /* ボタンを全幅に */
 }
 
 /* ボタンの種類ごとの色設定 */
@@ -218,4 +221,16 @@ a {
 
 a:hover {
     text-decoration: underline;
+}
+
+.btn {
+    background-color: #007bff; /* ボタンの背景色 */
+    color: white; /* ボタンの文字色 */
+    padding: 10px 15px; /* パディング */
+    text-decoration: none; /* 下線を消す */
+    border-radius: 5px; /* 角を丸くする */
+}
+
+.btn:hover {
+    background-color: #0056b3; /* ホバー時の背景色 */
 }
