@@ -186,7 +186,7 @@ try {
 <body>
     <h1>掲示板アプリ</h1>
     <div style="text-align: right;">
-        <a href="mypage.php" class="btn">マイページ</a>
+        <a href="view_mypage.php" class="btn">マイページ</a>
     </div>
     <!-- ログアウトボタンを追加 -->
     <form action="logout.php" method="post" style="text-align: right;">
