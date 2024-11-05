@@ -41,7 +41,6 @@ input, textarea {
 textarea {
     line-height: 1.5;
 }
-
 /* ボタンのデザイン */
 button {
     display: block;
@@ -76,6 +75,27 @@ button[name="cancel_btn"] {
     background-color: rgb(182, 182, 182);
 }
 
+/* 新たに追加したボタンの色設定 */
+button[name="participate_btn"] {
+    border: 1px solid rgb(0, 123, 255);
+    background-color: rgb(0, 102, 204);
+}
+
+button[name="apply_btn"] {
+    border: 1px solid rgb(255, 193, 7);
+    background-color: rgb(255, 193, 7);
+}
+
+button[name="confirm_btn"] {
+    border: 1px solid rgb(255, 0, 255);
+    background-color: rgb(255, 20, 147);
+}
+
+button[name="back_btn"] {
+    border: 1px solid rgb(0, 255, 127);
+    background-color: rgb(0, 204, 102);
+}
+
 /* ボタンのホバースタイル */
 button[name="post_btn"]:hover {
     background-color: rgb(116, 116, 255);
@@ -95,9 +115,27 @@ button[name="cancel_btn"]:hover {
     background-color: rgb(189, 189, 189);
 }
 
+/* 新たに追加したボタンのホバースタイル */
+button[name="participate_btn"]:hover {
+    background-color: rgb(0, 140, 255);
+}
+
+button[name="apply_btn"]:hover {
+    background-color: rgb(255, 221, 51);
+}
+
+button[name="confirm_btn"]:hover {
+    background-color: rgb(255, 100, 255);
+}
+
+button[name="back_btn"]:hover {
+    background-color: rgb(0, 255, 90);
+}
+
 .btn--mg-c {
     margin: 0 auto;
 }
+
 
 /* 投稿リスト */
 .post-list button {
