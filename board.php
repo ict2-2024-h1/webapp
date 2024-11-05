@@ -123,9 +123,9 @@ if (isset($_POST['post_btn'])) {
             */
             $sql = ('
             INSERT INTO
-            board_info (title, comment, contributor_id, contributor_username)
+            board_info (title, comment, contributor_id, contributor_username,participants)
             VALUES
-            (:TITLE, :COMMENT, :CONTRIBUTOR_ID, :CONTRIBUTOR_USERNAME)
+            (:TITLE, :COMMENT, :CONTRIBUTOR_ID, :CONTRIBUTOR_USERNAME,:PARTICIPANTS)
             ');
             $stmt = $pdo->prepare($sql);
             // プレースホルダーに値をセット
@@ -133,6 +133,7 @@ if (isset($_POST['post_btn'])) {
             $stmt->bindValue(':COMMENT', $comment, PDO::PARAM_STR);
             $stmt->bindValue(':CONTRIBUTOR_ID', $cont_id, PDO::PARAM_STR);
             $stmt->bindValue(':CONTRIBUTOR_USERNAME', $username, PDO::PARAM_STR);
+            $stmt->bindValue(':PARTICIPANTS', $cont_id, PDO::PARAM_STR);
             // SQL実行
             $stmt->execute();
             // 投稿に成功したらセッション変数を破棄
@@ -175,7 +176,6 @@ try {
 ?>
 <!DOCTYPE html>
 <html lang="ja">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -190,7 +190,7 @@ try {
     </div>
     <!-- ログアウトボタンを追加 -->
     <form action="logout.php" method="post" style="text-align: right;">
-        <button type="submit" class="logout_btn">ログアウト</button>
+        <button type="submit">ログアウト</button>
     </form>
 
     <!-- ユーザータイプに応じた内容 -->
@@ -234,6 +234,10 @@ try {
                     </div>
                 </div>
                 <button class="btn--mg-c" type="submit" name="post_btn" value="post_btn">投稿</button>
+                </form>
+                <form action="search.php" method="post" style="text-align: right;">
+                    <button type="submit">検索</button>
+                </form>
             </form>
         </section>
     <?php endif; ?>
@@ -260,11 +264,26 @@ try {
 <!-- 投稿日時 -->
 <span class="post-datetime">投稿日時：<?php echo $post_item['created_at']; ?></span>
 <!-- 過去に更新されていたら更新日時も表示 -->
+ 
 <?php if ($post_item['created_at'] < $post_item['updated_at']) : ?>
 <span class="post-datetime post-datetime__updated">更新日時：<?php echo $post_item['updated_at']; ?></span>
 <?php endif; ?>
 </form>
 <!-- 自分の投稿内容かつセッションが有効な間は編集・削除が可能 -->
+<?php if (strpos($post_item['participants'], $cont_id) !== false) : ?>
+                <form action="Paticipation.php" method="post">
+                        <button type="submit" name="update_btn">参加</button>
+                        <input type="hidden" name="post_id" value="<?php echo $post_item['id']; ?>">
+                </form>
+                <?php endif; ?>
+                <?php if (strpos($post_item['participants'], $cont_id) === false) : ?>
+                    <?php if (strpos($post_item['participants_wait'], $cont_id) === false) : ?>
+                    <form action="Paticipation_wait.php" method="post">
+                        <button type="submit" name="update_btn">参加申請</button>
+                        <input type="hidden" name="post_id" value="<?php echo $post_item['id']; ?>">
+                    </form>
+                    <?php endif; ?>
+                <?php endif; ?>
 <?php if ($post_item['contributor_id'] === $cont_id) : ?>
 <div class="btn-flex">
 <form action="update-edit.php" method="post">
@@ -275,6 +294,10 @@ try {
 <button type="submit" name="delete_btn">削除</button>
 <input type="hidden" name="post_id" value="<?php echo $post_item['id']; ?>">
 </form>
+<form action="Paticipation_edit.php" method="post">
+                        <button type="submit" name="delete_btn">参加者管理</button>
+                        <input type="hidden" name="post_id" value="<?php echo $post_item['id']; ?>">
+                    </form>
 </div>
 <?php endif; ?>
 <?php if (isset($_SESSION['id']) && ($_SESSION['id'] == $post_item['id'])): ?>
