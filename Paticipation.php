@@ -8,6 +8,7 @@ const DB_USER = 'root';
 const DB_PASSWORD = '';
 $post_detail = null; // 投稿の詳細を格納する変数
 $uid=$_SESSION['uid'];// 追加 ID値を渡す
+$uname=$_SESSION['username'];// 追加 ID値を渡す
 // 参加ボタンが押されたか確認
 if (isset($_POST['update_btn']) && isset($_POST['post_id'])) {
     $post_id = (int)$_POST['post_id'];  // post_id を取得し整数に変換
@@ -30,6 +31,7 @@ if (isset($_POST['update_btn']) && isset($_POST['post_id'])) {
             CREATE TABLE IF NOT EXISTS $table_name (
                 id INT AUTO_INCREMENT PRIMARY KEY,
                 contributor_id VARCHAR(255) NOT NULL,
+                contributor_name VARCHAR(255) NOT NULL,
                 message TEXT NOT NULL,
                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
@@ -39,9 +41,11 @@ if (isset($_POST['update_btn']) && isset($_POST['post_id'])) {
         // 参加後にその掲示板に投稿するフォームを表示
         if (isset($_POST['message']) && !empty($_POST['message'])) {
             // メッセージが送信された場合、そのメッセージをテーブルに挿入
-            $sql_insert_message = "INSERT INTO $table_name (contributor_id, message) VALUES (:contributor_id, :message)";
+            $sql_insert_message = "INSERT INTO $table_name (contributor_id,contributor_name, message) VALUES (:contributor_id,:contributor_name, :message)";
+            $username = $uname;
             $stmt = $pdo->prepare($sql_insert_message);
             $stmt->bindValue(':contributor_id', $userid);  // ユーザーID（セッションから）
+            $stmt->bindValue(':contributor_name', $username);  // ユーザーID（セッションから）
             $stmt->bindValue(':message', $_POST['message'], PDO::PARAM_STR);  // メッセージ
             $stmt->execute();
         }
@@ -72,7 +76,7 @@ if (isset($_POST['update_btn']) && isset($_POST['post_id'])) {
         <h2>投稿の詳細</h2>
         <p><strong>タイトル:</strong> <?php echo htmlspecialchars($post_detail['title'], ENT_QUOTES, 'UTF-8'); ?></p>
         <p><strong>投稿内容:</strong> <?php echo nl2br(htmlspecialchars($post_detail['comment'], ENT_QUOTES, 'UTF-8')); ?></p>
-        <p><strong>投稿者ID:</strong> <?php echo htmlspecialchars($post_detail['contributor_id'], ENT_QUOTES, 'UTF-8'); ?></p>
+        <p><strong>投稿者ID:</strong> <?php echo htmlspecialchars($post_detail['contributor_username'], ENT_QUOTES, 'UTF-8'); ?></p>
         <p><strong>投稿日:</strong> <?php echo htmlspecialchars($post_detail['created_at'], ENT_QUOTES, 'UTF-8'); ?></p>
     <?php else : ?>
         <p>該当する投稿は存在しません。</p>
@@ -94,7 +98,7 @@ if (isset($_POST['update_btn']) && isset($_POST['post_id'])) {
         <ul>
             <?php foreach ($messages as $message) : ?>
                 <li>
-                    <strong><?php echo htmlspecialchars($message['contributor_id'], ENT_QUOTES, 'UTF-8'); ?>:</strong>
+                    <strong><?php echo htmlspecialchars($message['contributor_name'], ENT_QUOTES, 'UTF-8'); ?>:</strong>
                     <?php echo nl2br(htmlspecialchars($message['message'], ENT_QUOTES, 'UTF-8')); ?>
                     <small>（<?php echo htmlspecialchars($message['created_at'], ENT_QUOTES, 'UTF-8'); ?>）</small>
                 </li>

@@ -32,6 +32,7 @@
             session_start();
             $_SESSION['uid'] = $uid;
             $_SESSION['user_type'] = $user_type;
+            $_SESSION['username'] = $username;
             header("Location: board.php");
             exit();
         }

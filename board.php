@@ -22,6 +22,9 @@ const DB_PASSWORD = '';
 
 $uid=$_SESSION['uid'];// 追加 ID値を渡す
 $_SESSION['uid'] = $uid;
+$username=$_SESSION['username'];
+$_SESSION['username'] = $username;
+
 $user_type = isset($_SESSION['user_type']) ? $_SESSION['user_type'] : ''; // ユーザータイプをセッションから取得
 if (empty($user_type)) {
     echo "ユーザタイプを未取得";

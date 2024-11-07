@@ -14,6 +14,7 @@ if (!isset($_SESSION['uid'])) {
 }
 
 $uid = $_SESSION['uid'];
+$uname=$_SESSION['username'];// 追加 ID値を渡す
 
 // post_id が設定されているか確認
 if (!isset($_POST['post_id'])) {
