@@ -48,6 +48,18 @@ try {
         echo '参加者情報が見つかりませんでした。';
         exit();
     }
+    $sql = "SELECT username FROM account WHERE uid = :result";
+    $stmt = $pdo->prepare($sql);
+    $stmt->bindValue(':result', $uid, PDO::PARAM_INT);
+    $stmt->execute();
+
+// usernameを取得して$participants_nameに格納
+    $participants_name = '';
+    if ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+        $participants_name = $row['username'];
+    } else {
+        echo '指定されたUIDに対応するユーザーが見つかりませんでした。';
+    }
 
     if ($result) {
         $participants_wait = explode(',', $result['participants_wait']);
@@ -111,7 +123,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
         <ul>
             <?php foreach ($participants_wait as $participant_uid) : ?>
                 <li>
-                    <span>UID: <?php echo htmlspecialchars($participant_uid); ?></span>
+                    <span>UID: <?php echo htmlspecialchars($participants_name); ?></span>
                     <button type="submit" name="approve_<?php echo htmlspecialchars($participant_uid); ?>">承認</button>
                     <button type="submit" name="disapprove_<?php echo htmlspecialchars($participant_uid); ?>">不承認</button>
                 </li>
