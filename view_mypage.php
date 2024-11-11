@@ -27,11 +27,11 @@ $user = $stmt->fetch(PDO::FETCH_ASSOC);
 <html lang="ja">
 <head>
     <meta charset="UTF-8">
-    <title>マイページ</title>
-    <link rel="stylesheet" href="./style.css">
+    <title>アカウント詳細</title>
+    <link rel="stylesheet" href="mypage_style.css">
 </head>
 <body>
-    <h1>マイページ</h1>
+    <h1>アカウント詳細</h1>
     <p>姓: <?php echo htmlspecialchars($user['LastName']); ?></p>
     <p>姓（カナ）: <?php echo htmlspecialchars($user['LastNameKana']); ?></p>
     <p>名: <?php echo htmlspecialchars($user['FirstName']); ?></p>

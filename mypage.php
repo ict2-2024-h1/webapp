@@ -83,11 +83,11 @@ try {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>マイページ 編集</title>
-    <link rel="stylesheet" href="./style.css">
+    <title>アカウント詳細 編集</title>
+    <link rel="stylesheet" href="mypage_style.css">
 </head>
 <body>
-    <h1>マイページ 編集</h1>
+    <h1>アカウント詳細 編集</h1>
     <form action="" method="post">
         <div>
             <label for="last_name">姓</label>
