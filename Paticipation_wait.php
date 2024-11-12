@@ -10,7 +10,7 @@ const DB_USER = 'root';
 const DB_PASSWORD = '';
 
 $cont_id = $_SESSION['uid'];  // ユーザーIDをセッションから取得
-if (isset($_POST['update_btn'])) {
+if (isset($_POST['apply_btn'])) {
     $post_id = $_POST['post_id'];
     $user_id = $cont_id; // 現在のユーザーID
     try {

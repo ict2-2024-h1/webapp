@@ -193,6 +193,7 @@ try {
     echo '接続失敗' . $e->getMessage();
     exit();
 }
+
 ?>
 <!DOCTYPE html>
 <html lang="ja">
@@ -316,7 +317,6 @@ try {
                         <!-- 投稿情報の出力 -->
                         <?php foreach ($post_list as $post_item) : ?>
                             <li>
-                                <form action="" method="post">
                                     <!-- 投稿ID -->
                                 <span>ID：<?php echo $post_item['id']; ?></span>
                                 <!-- 投稿タイトル -->
@@ -328,7 +328,35 @@ try {
                                 <!-- 募集人数 -->
                                 <span>募集人数：<?php echo $post_item['recruitment_count']; ?>名</span>
                                 <!-- 投稿者ID -->
-                                <span>／投稿者：<?php echo isset($post_item['contributor_username']) ? $post_item['contributor_username'] : '不明なユーザー'; ?></span>
+                                <?php
+                                // contributor_uidが設定されているかチェック
+                                $contributor_id = isset($post_item['contributor_id']) ? $post_item['contributor_id'] : null;
+
+                                // contributor_uidが存在する場合にのみ、usernameを取得
+                                
+                                $username = '不明なユーザー';
+                                if ($contributor_id) {
+                                // データベース接続
+                                // SQLクエリでcontributor_uidを参照し、accountテーブルからusernameを取得
+                                    $stmt = $pdo->prepare("SELECT username FROM account WHERE uid = :contributor_id");
+                                    $stmt->bindParam(':contributor_id', $contributor_id);
+                                    $stmt->execute();
+    
+                                // 結果を取得し、存在する場合は$usernameにセット
+                                    $result = $stmt->fetch(PDO::FETCH_ASSOC);
+                                    
+                                    if ($result) {
+                                        $username = $result['username'];
+                                    }
+                                }
+                                ?>
+                                <span>／投稿者：
+                                <form action="companyprofile.php" method="post">
+                                    <button type="submit" name="studentprof_btn" value="studentprof_btn"><?php echo $username; ?></button>
+                                    <input type="hidden" name="user_id" value="<?php echo $post_item['contributor_id']; ?>">
+                                </form>
+                                </span>
+
                                 <!-- 投稿内容 -->
                                 <p class="p-pre"><?php echo $post_item['comment']; ?></p>
                                 <!-- 投稿日時 -->
@@ -337,7 +365,6 @@ try {
                                 <?php if ($post_item['created_at'] < $post_item['updated_at']) : ?>
                                     <span class="post-datetime post-datetime__updated">更新日時：<?php echo $post_item['updated_at']; ?></span>
                                     <?php endif; ?>
-                                </form>
                                 <!-- 自分の投稿内容かつセッションが有効な間は編集・削除が可能 -->
                                 <?php if (strpos($post_item['participants'], $cont_id) !== false) : ?>
                                     <form action="Paticipation.php" method="post">
@@ -372,6 +399,79 @@ try {
                                 <?php if (isset($_SESSION['id']) && ($_SESSION['id'] == $post_item['id'])): ?>
                                     <p class='updated-post'>更新しました</p>
                                 <?php endif; ?>
+                            </li>
+                        <?php endforeach; ?>
+                    </ul>
+                <?php endif; ?>
+            </div>
+        </section>
+    <?php endif; ?>
+    <?php if ($user_type === 'company') :?>
+        
+        
+        <section class="post-container">
+            <div class="post-form-container">
+                <form action="search.php" method="post" style="text-align: right;">
+                    <button type="submit" name="apply_btn">検索</button>
+                </form>
+            </div>
+            <!-- 投稿一覧 -->
+            <div class="post-list-container">
+                <?php if (count($post_list) === 0) : ?>
+                    <!-- 投稿が無いときはメッセージを表示する -->
+                    <p class="no-post-msg">現在、投稿はありません。</p>
+                <?php else : ?>
+                    <ul>
+                        <!-- 投稿情報の出力 -->
+                        <?php foreach ($post_list as $post_item) : ?>
+                            <li>
+                                    <!-- 投稿ID -->
+                                <span>ID：<?php echo $post_item['id']; ?></span>
+                                <!-- 投稿タイトル -->
+                                <span><?php echo $post_item['title']; ?></span>
+                                <!-- カテゴリ -->
+                                <span>カテゴリ：<?php echo $post_item['category']; ?></span>
+                                <!-- 使用言語 -->
+                                <span>使用言語：<?php echo $post_item['language']; ?></span>
+                                <!-- 募集人数 -->
+                                <span>募集人数：<?php echo $post_item['recruitment_count']; ?>名</span>
+                                <!-- 投稿者ID -->
+                                <?php
+                                // contributor_uidが設定されているかチェック
+                                $contributor_id = isset($post_item['contributor_id']) ? $post_item['contributor_id'] : null;
+
+                                // contributor_uidが存在する場合にのみ、usernameを取得
+                                
+                                $username = '不明なユーザー';
+                                if ($contributor_id) {
+                                // データベース接続
+                                // SQLクエリでcontributor_uidを参照し、accountテーブルからusernameを取得
+                                    $stmt = $pdo->prepare("SELECT username FROM account WHERE uid = :contributor_id");
+                                    $stmt->bindParam(':contributor_id', $contributor_id);
+                                    $stmt->execute();
+    
+                                // 結果を取得し、存在する場合は$usernameにセット
+                                    $result = $stmt->fetch(PDO::FETCH_ASSOC);
+                                    
+                                    if ($result) {
+                                        $username = $result['username'];
+                                    }
+                                }
+                                ?>
+                                <span>／投稿者：
+                                <form action="companyprofile.php" method="post">
+                                    <button type="submit" name="studentprof_btn" value="studentprof_btn"><?php echo $username; ?></button>
+                                    <input type="hidden" name="user_id" value="<?php echo $post_item['contributor_id']; ?>">
+                                </form>
+                                </span>
+                                <!-- 投稿内容 -->
+                                <p class="p-pre"><?php echo $post_item['comment']; ?></p>
+                                <!-- 投稿日時 -->
+                                <span class="post-datetime">投稿日時：<?php echo $post_item['created_at']; ?></span>
+                                <!-- 更新日時 -->
+                                <?php if ($post_item['created_at'] < $post_item['updated_at']) : ?>
+                                    <span class="post-datetime post-datetime__updated">更新日時：<?php echo $post_item['updated_at']; ?></span>
+                                    <?php endif; ?>
                             </li>
                         <?php endforeach; ?>
                     </ul>

@@ -76,7 +76,6 @@ try {
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
     foreach ($participants_wait as $participant_uid) {
         if (isset($_POST['approve_' . $participant_uid])) {
-            print_r($result); 
             // 参加者を承認
             $current_participants = explode(',', $rresult['participants'] ?? '');
 
@@ -121,13 +120,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
     <form action="#" method="post">
         <input type="hidden" name="post_id" value="<?php echo htmlspecialchars($post_id); ?>">
         <ul>
-            <?php foreach ($participants_wait as $participant_uid) : ?>
-                <li>
-                    <span>UID: <?php echo htmlspecialchars($participants_name); ?></span>
-                    <button type="submit" name="approve_<?php echo htmlspecialchars($participant_uid); ?>">承認</button>
-                    <button type="submit" name="disapprove_<?php echo htmlspecialchars($participant_uid); ?>">不承認</button>
-                </li>
-            <?php endforeach; ?>
+            <?php if($participants_wait[0] != NULL): ?>
+                <?php foreach ($participants_wait as $participant_uid) : ?>
+                    <li>
+                        <span>参加申請者：
+                            <button type="submit" name="studentprof_btn" formaction="companyprofile.php" formmethod="post" value="studentprof_btn">
+                                <?php echo htmlspecialchars($participants_name); ?>
+                            </button>
+                            <input type="hidden" name="user_id" value="<?php echo htmlspecialchars($participant_uid); ?>">
+                        </span>
+                        <button type="submit" name="approve_<?php echo htmlspecialchars($participant_uid); ?>">承認</button>
+                        <button type="submit" name="disapprove_<?php echo htmlspecialchars($participant_uid); ?>">不承認</button>
+                    </li>
+                <?php endforeach; ?>
+            <?php endif; ?>
         </ul>
         <input type="hidden" name="action" value="manage_participants">
     </form>

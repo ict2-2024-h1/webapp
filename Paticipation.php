@@ -10,7 +10,7 @@ $post_detail = null; // 投稿の詳細を格納する変数
 $uid=$_SESSION['uid'];// 追加 ID値を渡す
 $uname=$_SESSION['username'];// 追加 ID値を渡す
 // 参加ボタンが押されたか確認
-if (isset($_POST['update_btn']) && isset($_POST['post_id'])) {
+if (isset($_POST['participate_btn']) && isset($_POST['post_id'])) {
     $post_id = (int)$_POST['post_id'];  // post_id を取得し整数に変換
     $userid=$uid;
     try {
@@ -76,7 +76,31 @@ if (isset($_POST['update_btn']) && isset($_POST['post_id'])) {
         <h2>投稿の詳細</h2>
         <p><strong>タイトル:</strong> <?php echo htmlspecialchars($post_detail['title'], ENT_QUOTES, 'UTF-8'); ?></p>
         <p><strong>投稿内容:</strong> <?php echo nl2br(htmlspecialchars($post_detail['comment'], ENT_QUOTES, 'UTF-8')); ?></p>
-        <p><strong>投稿者ID:</strong> <?php echo htmlspecialchars($post_detail['contributor_username'], ENT_QUOTES, 'UTF-8'); ?></p>
+        <p><strong>投稿者:</strong> <?php
+                                // contributor_uidが設定されているかチェック
+                                $contributor_id = isset($post_detail['contributor_id']) ? $post_detail['contributor_id'] : null;
+
+                                // contributor_uidが存在する場合にのみ、usernameを取得
+                                
+                                $username = '不明なユーザー';
+                                if ($contributor_id) {
+                                // データベース接続
+                                // SQLクエリでcontributor_uidを参照し、accountテーブルからusernameを取得
+                                    $stmt = $pdo->prepare("SELECT username FROM account WHERE uid = :contributor_id");
+                                    $stmt->bindParam(':contributor_id', $contributor_id);
+                                    $stmt->execute();
+    
+                                // 結果を取得し、存在する場合は$usernameにセット
+                                    $result = $stmt->fetch(PDO::FETCH_ASSOC);
+                                    
+                                    if ($result) {
+                                        $username = $result['username'];
+                                    }
+                                }
+                                ?>
+
+                                <?php echo $username; ?>
+    </p>
         <p><strong>投稿日:</strong> <?php echo htmlspecialchars($post_detail['created_at'], ENT_QUOTES, 'UTF-8'); ?></p>
     <?php else : ?>
         <p>該当する投稿は存在しません。</p>
@@ -85,7 +109,7 @@ if (isset($_POST['update_btn']) && isset($_POST['post_id'])) {
     <form action="#" method="post">
         <textarea name="message" placeholder="メッセージを入力" rows="5" cols="40"></textarea>
         <input type="hidden" name="post_id" value="<?php echo htmlspecialchars($post_id, ENT_QUOTES, 'UTF-8'); ?>">
-        <button type="submit" name="update_btn">メッセージ送信</button>
+        <button type="submit" name="participate_btn">メッセージ送信</button>
     </form>
     <form action="board.php" method="post">
             <button type="submit" name="update_btn">掲示板に戻る</button>
@@ -98,7 +122,24 @@ if (isset($_POST['update_btn']) && isset($_POST['post_id'])) {
         <ul>
             <?php foreach ($messages as $message) : ?>
                 <li>
-                    <strong><?php echo htmlspecialchars($message['contributor_name'], ENT_QUOTES, 'UTF-8'); ?>:</strong>
+                    <?php
+                        // contributor_uidが設定されているかチェック
+                        $contributor_id = isset($message['contributor_id']) ? $message['contributor_id'] : null;
+                        // contributor_uidが存在する場合にのみ、usernameを取得
+                        $username = '不明なユーザー';
+                        if ($contributor_id) {
+                        // SQLクエリでcontributor_uidを参照し、accountテーブルからusernameを取得
+                            $stmt = $pdo->prepare("SELECT username FROM account WHERE uid = :contributor_id");
+                            $stmt->bindParam(':contributor_id', $contributor_id);
+                            $stmt->execute();
+                            // 結果を取得し、存在する場合は$usernameにセット
+                            $result = $stmt->fetch(PDO::FETCH_ASSOC);
+                            if ($result) {
+                                $username = $result['username'];
+                            }
+                        }
+                    ?>
+                    <strong><?php echo htmlspecialchars($username, ENT_QUOTES, 'UTF-8'); ?>:</strong>
                     <?php echo nl2br(htmlspecialchars($message['message'], ENT_QUOTES, 'UTF-8')); ?>
                     <small>（<?php echo htmlspecialchars($message['created_at'], ENT_QUOTES, 'UTF-8'); ?>）</small>
                 </li>
