@@ -1,0 +1,124 @@
+
+nav {
+    display: flex;
+    justify-content: space-between;
+    border-bottom: 2px solid #000;
+    padding-bottom: 10px;
+    margin-bottom: 20px;
+}
+
+nav a {
+    text-decoration: none;
+    margin: 0 10px;
+    color: #000;
+    font-weight: bold;
+}
+
+.logo {
+    width: 220px; /* 幅を150pxに指定 */
+    height: auto; /* 高さは自動調整 */
+}
+
+/* 投稿フォームと投稿一覧を横並びにする親コンテナ */
+.post-container {
+    display: flex;             /* 横並びにするための設定 */
+    justify-content: space-between;  /* 子要素間にスペースを作る */
+    gap: 30px;                 /* 子要素間に適度な間隔を追加 */
+    width: 100%;               /* 親コンテナが画面幅いっぱいに広がる */
+    box-sizing: border-box;    /* パディングやボーダーを含む幅指定 */
+    background-color: #f9f9f9; /* 親コンテナの背景色 */
+    padding: 20px;             /* 内側の余白を追加 */
+}
+
+/* 投稿フォームのスタイル */
+.post-form-container {
+    flex: 1;                   /* 横幅を均等にする */
+    max-width: 600px;          /* 最大幅を設定（適宜調整） */
+    padding: 20px;             /* 内側の余白を追加 */
+    background-color: #ffffff; /* 背景色を白に設定 */
+    border-radius: 8px;        /* 角を丸くする */
+    border: 1px solid #ddd;    /* 境界線を追加 */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* 軽いシャドウを追加 */
+}
+
+/* 投稿一覧のスタイル */
+.post-list-container {
+    flex: 2;                   /* 投稿一覧部分を少し広くする */
+    max-width: 1000px;         /* 最大幅を設定（適宜調整） */
+    padding: 20px;             /* 内側の余白を追加 */
+    background-color: #ffffff; /* 背景色を白に設定 */
+    border-radius: 8px;        /* 角を丸くする */
+    border: 1px solid #ddd;    /* 境界線を追加 */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* 軽いシャドウを追加 */
+}
+
+/* 投稿フォームのスタイル */
+.post-form_flex {
+    display: flex;
+    flex-direction: column;
+    padding: 20px;             /* 内側の余白を追加 */
+    gap: 15px;
+}
+
+.post-form_flex label {
+    display: flex;
+    flex-direction: column;
+}
+
+.post-form_flex input,
+.post-form_flex textarea {
+    padding: 10px;
+    font-size: 16px;
+    width: 100%;  /* 横幅を100%にして、親要素にフィットさせる */
+    box-sizing: border-box;
+}
+
+.post-form_flex textarea {
+    resize: vertical;  /* 縦のリサイズを許可 */
+}
+
+/* ボタンのスタイル */
+button {
+    padding: 10px 20px;
+    font-size: 16px;
+    cursor: pointer;
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    transition: background-color 0.3s ease;
+}
+
+button:hover {
+    background-color: #45a049;
+}
+
+/* 投稿一覧のリスト */
+ul {
+    list-style: none;
+    padding: 0;
+}
+
+li {
+    margin-bottom: 30px;  /* 各投稿間に余白を追加 */
+    padding: 15px;        /* 各投稿の内側に余白を追加 */
+    background-color: #f9f9f9;  /* 投稿ごとの背景色 */
+    border-radius: 8px;    /* 角を丸くする */
+    border: 1px solid #ddd;  /* 境界線を追加 */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* 軽いシャドウを追加 */
+}
+
+/* メディアクエリ：画面が狭い場合に縦並びに変更 */
+@media screen and (max-width: 1024px) {
+    .post-container {
+        flex-direction: column;  /* 横並びから縦並びに変更 */
+        align-items: center;     /* 中央揃え */
+    }
+    .post-form-container,
+    .post-list-container {
+        max-width: 100%;         /* 幅を100%にして、画面いっぱいに広げる */
+    }
+    .post-form-container {
+        margin-bottom: 20px;  /* 下に少し余白を追加 */
+    }
+}

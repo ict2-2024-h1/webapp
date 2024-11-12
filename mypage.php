@@ -83,11 +83,11 @@ try {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>マイページ</title>
-    <link rel="stylesheet" href="./style.css">
+    <title>アカウント詳細 編集</title>
+    <link rel="stylesheet" href="mypage_style.css">
 </head>
 <body>
-    <h1>マイページ</h1>
+    <h1>アカウント詳細 編集</h1>
     <form action="" method="post">
         <div>
             <label for="last_name">姓</label>
@@ -127,7 +127,8 @@ try {
         </div>
         <button type="submit">更新</button>
     </form>
-    <a href="board.php">掲示板に戻る</a>
+    <p><a href="view_mypage.php">マイページに戻る</a></p>
+    <p><a href="board.php">掲示板に戻る</a></p>
 </body>
 
 </html>

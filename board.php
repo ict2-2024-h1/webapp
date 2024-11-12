@@ -40,13 +40,14 @@ try {
     PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,      // 例外が発生した際にスローする
     ]);
     $sql = ('
-    SELECT UserName 
-    FROM  account
+    SELECT UserName, User_type 
+    FROM account
     WHERE UID = :uid
     ');
+    
     $stmt = $pdo->prepare($sql);
     
-    // プレースホルダに検索するのuid値をバインド
+    // プレースホルダに検索するuid値をバインド
     $stmt->bindParam(':uid', $uid);
     
     // SQL実行
@@ -54,10 +55,12 @@ try {
     
     // 検索結果を取得
     $result = $stmt->fetch(PDO::FETCH_ASSOC);
-    $username = $result['UserName'];
 
     if ($result) {
-        echo 'ログイン中ユーザー: ' . $result['UserName'];
+        $username = $result['UserName'];
+        $user_type = $result['User_type'];
+
+        echo 'ログイン中ユーザー: ' . $username . '（ユーザータイプ: ' . $user_type . '）';
     } else {
         echo '指定されたUIDは見つかりませんでした。';
     }
@@ -82,14 +85,7 @@ $cont_id = $uid;
  * 投稿ボタンが押下されたときの処理
  */
 if (isset($_POST['post_btn'])) {
-    // 更新操作用の処理
-    unset($_SESSION['id']);
-    /**
-    * セッション変数に情報を保存して
-    * タイトルまたは投稿内容の片方だけが
-    * 入力されていた場合、
-    * 入力フォームに内容を保持する
-    */
+    // タイトルと内容が入力されているかチェック
     if (isset($_POST['post_title']) && $_POST['post_title'] != '') {
         $_SESSION['title'] = $_POST['post_title'];
     } else {
@@ -100,35 +96,48 @@ if (isset($_POST['post_btn'])) {
     } else {
         unset($_SESSION['comment']);
     }
-    /**
-    * エラーメッセージ格納
-    */
-    if ($_POST['post_title'] == '') $err_msg_title  = '※タイトルを入力して下さい';
-    if ($_POST['post_comment'] == '') $err_msg_comment  = '※投稿内容を入力して下さい';
-    /**
-    * 必要項目がすべて入力されてたら投稿処理を実行
-    */
+
+    // カテゴリ、使用言語、募集人数も確認
+    if (isset($_POST['post_category']) && $_POST['post_category'] != '') {
+        $_SESSION['category'] = $_POST['post_category'];
+    } else {
+        unset($_SESSION['category']);
+    }
+
+    if (isset($_POST['post_language']) && $_POST['post_language'] != '') {
+        $_SESSION['language'] = $_POST['post_language'];
+    } else {
+        unset($_SESSION['language']);
+    }
+
+    if (isset($_POST['post_recruitment_count']) && $_POST['post_recruitment_count'] != '') {
+        $_SESSION['recruitment_count'] = $_POST['post_recruitment_count'];
+    } else {
+        unset($_SESSION['recruitment_count']);
+    }
+
+    // 必要項目がすべて入力されている場合、投稿処理を実行
     if (
-    isset($_POST['post_title']) && $_POST['post_title'] != '' &&
-    isset($_POST['post_comment']) && $_POST['post_comment'] != ''
+        isset($_POST['post_title']) && $_POST['post_title'] != '' &&
+        isset($_POST['post_comment']) && $_POST['post_comment'] != '' &&
+        isset($_POST['post_recruitment_count']) && $_POST['post_recruitment_count'] != ''
     ) {
         $title = $_POST['post_title'];
         $comment = $_POST['post_comment'];
+        $category = $_POST['post_category'];
+        $language = $_POST['post_language'];
+        $recruitment_count = $_POST['post_recruitment_count'];
+
         try {
-            /**
-            * DB接続処理
-            */
+            // DB接続
             $pdo = new PDO(DB_HOST, DB_USER, DB_PASSWORD, [
-            PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,      // 例外が発生した際にスローする
+                PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
             ]);
-            /**
-            * 投稿内容登録処理
-            */
+
+            // 投稿内容登録処理
             $sql = ('
-            INSERT INTO
-            board_info (title, comment, contributor_id, contributor_username,participants)
-            VALUES
-            (:TITLE, :COMMENT, :CONTRIBUTOR_ID, :CONTRIBUTOR_USERNAME,:PARTICIPANTS)
+                INSERT INTO board_info (title, comment, contributor_id, contributor_username, participants, category, language, recruitment_count)
+                VALUES (:TITLE, :COMMENT, :CONTRIBUTOR_ID, :CONTRIBUTOR_USERNAME, :PARTICIPANTS, :CATEGORY, :LANGUAGE, :RECRUITMENT_COUNT)
             ');
             $stmt = $pdo->prepare($sql);
             // プレースホルダーに値をセット
@@ -137,11 +146,19 @@ if (isset($_POST['post_btn'])) {
             $stmt->bindValue(':CONTRIBUTOR_ID', $cont_id, PDO::PARAM_STR);
             $stmt->bindValue(':CONTRIBUTOR_USERNAME', $username, PDO::PARAM_STR);
             $stmt->bindValue(':PARTICIPANTS', $cont_id, PDO::PARAM_STR);
+            $stmt->bindValue(':CATEGORY', $category, PDO::PARAM_STR);
+            $stmt->bindValue(':LANGUAGE', $language, PDO::PARAM_STR);
+            $stmt->bindValue(':RECRUITMENT_COUNT', $recruitment_count, PDO::PARAM_INT);
+
             // SQL実行
             $stmt->execute();
-            // 投稿に成功したらセッション変数を破棄
+
+            // 投稿成功後、セッション変数を破棄
             unset($_SESSION['title']);
             unset($_SESSION['comment']);
+            unset($_SESSION['category']);
+            unset($_SESSION['language']);
+            unset($_SESSION['recruitment_count']);
         } catch (PDOException $e) {
             echo '接続失敗' . $e->getMessage();
             exit();
@@ -183,18 +200,21 @@ try {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>掲示板アプリ</title>
-    <link rel="stylesheet" href="./style.css">
+    <link rel="stylesheet" href="./board_style.css">
 </head>
 
 <body>
-    <h1>掲示板アプリ</h1>
-    <div style="text-align: right;">
-        <a href="mypage.php" class="btn">マイページ</a>
-    </div>
-    <!-- ログアウトボタンを追加 -->
-    <form action="logout.php" method="post" style="text-align: right;">
-        <button type="submit">ログアウト</button>
-    </form>
+    <nav>
+        <!-- ロゴ画像 -->
+         <img src="logo.png" alt="ロゴ画像" class="logo">
+        <div class="nav-links">
+            <a href="#">通知</a>
+            <a href="#">プロジェクト</a>
+            <a href="profile.php">プロフィール</a>
+            <a href="view_mypage.php">アカウント詳細</a>
+            <a href="logout.php">ログアウト</a>
+        </div>
+    </nav>
 
     <!-- ユーザータイプに応じた内容 -->
     <section>
@@ -211,106 +231,154 @@ try {
     </section>
 
     <?php if ($user_type === 'student') : ?>
-        <!-- 投稿フォーム -->
-        <section class="post-form">
-            <form action="#" method="post">
-                <div class="post-form__flex">
-                    <div>
-                        <label>
-                            <p>タイトル（※最大30文字）</p>
-                            <input type="text" name="post_title" value="<?php if (isset($_SESSION['title'])) echo $_SESSION['title']; ?>">
-                            <!-- エラーメッセージ -->
-                            <?php if (isset($err_msg_title)) {
-                                echo "<p class='err'>{$err_msg_title}</p>";
-                            } ?>
-                        </label>
+        <section class="post-container">
+
+            <!-- 投稿フォーム -->
+            <div class="post-form-container">
+                <form action="#" method="post">
+                    <div class="post-form_flex">
+
+                        <div>
+                            <label>
+                                <p>タイトル（※最大30文字）</p>
+                                <input type="text" name="post_title" value="<?php if (isset($_SESSION['title'])) echo $_SESSION['title']; ?>">
+                                <!-- エラーメッセージ -->
+                                <?php if (isset($err_msg_title)) {
+                                    echo "<p class='err'>{$err_msg_title}</p>";
+                                } ?>
+                            </label>
+                        </div>
+
+                        <div>
+                            <label>
+                                <p>投稿内容（※最大1000文字）</p>
+                                <textarea name="post_comment" cols="50" rows="10"><?php if (isset($_SESSION['comment'])) echo $_SESSION['comment']; ?></textarea>
+                                <!-- エラーメッセージ -->
+                                <?php if (isset($err_msg_comment)) {
+                                    echo "<p class='err'>{$err_msg_comment}</p>";
+                                } ?>
+                            </label>
+                        </div>
+
+                        <!-- カテゴリ -->
+                        <div>
+                            <label>
+                                <p>カテゴリ</p>
+                                <input type="text" name="post_category" value="<?php if (isset($_SESSION['category'])) echo $_SESSION['category']; ?>">
+                                <!-- エラーメッセージ -->
+                                <?php if (isset($err_msg_comment)) {
+                                    echo "<p class='err'>{$err_msg_comment}</p>";
+                                } ?>
+                            </label>
+                        </div>
+
+                        <!-- 使用言語 -->
+                        <div>
+                            <label>
+                                <p>使用言語</p>
+                                <input type="text" name="post_language" value="<?php if (isset($_SESSION['language'])) echo $_SESSION['language']; ?>">
+                                <!-- エラーメッセージ -->
+                                <?php if (isset($err_msg_comment)) {
+                                    echo "<p class='err'>{$err_msg_comment}</p>";
+                                } ?>
+                            </label>
+                        </div>
+
+                        <!-- 募集人数 -->
+                        <div>
+                            <label>
+                                <p>募集人数</p>
+                                <input type="number" name="post_recruitment_count" value="<?php if (isset($_SESSION['recruitment_count'])) echo $_SESSION['recruitment_count']; ?>">
+                                <!-- エラーメッセージ -->
+                                <?php if (isset($err_msg_comment)) {
+                                    echo "<p class='err'>{$err_msg_comment}</p>";
+                                } ?>
+                            </label>
+                        </div>
+
                     </div>
-                    <div>
-                        <label>
-                            <p>投稿内容（※最大1000文字）</p>
-                            <textarea name="post_comment" cols="50" rows="10"><?php if (isset($_SESSION['comment'])) echo $_SESSION['comment']; ?></textarea>
-                            <!-- エラーメッセージ -->
-                            <?php if (isset($err_msg_comment)) {
-                                echo "<p class='err'>{$err_msg_comment}</p>";
-                            } ?>
-                        </label>
-                    </div>
-                </div>
-                <button class="btn--mg-c" type="submit" name="post_btn" value="post_btn">投稿</button>
+                    <button class="btn--mg-c" type="submit" name="post_btn" value="post_btn">投稿</button>
                 </form>
+                
                 <form action="search.php" method="post" style="text-align: right;">
-                    <button type="submit">検索</button>
+                    <button type="submit" name="apply_btn">検索</button>
                 </form>
-            </form>
+
+            </div>
+            
+            <!-- 投稿一覧 -->
+            <div class="post-list-container">
+                <?php if (count($post_list) === 0) : ?>
+                    <!-- 投稿が無いときはメッセージを表示する -->
+                    <p class="no-post-msg">現在、投稿はありません。</p>
+                <?php else : ?>
+                    <ul>
+                        <!-- 投稿情報の出力 -->
+                        <?php foreach ($post_list as $post_item) : ?>
+                            <li>
+                                <form action="" method="post">
+                                    <!-- 投稿ID -->
+                                <span>ID：<?php echo $post_item['id']; ?></span>
+                                <!-- 投稿タイトル -->
+                                <span><?php echo $post_item['title']; ?></span>
+                                <!-- カテゴリ -->
+                                <span>カテゴリ：<?php echo $post_item['category']; ?></span>
+                                <!-- 使用言語 -->
+                                <span>使用言語：<?php echo $post_item['language']; ?></span>
+                                <!-- 募集人数 -->
+                                <span>募集人数：<?php echo $post_item['recruitment_count']; ?>名</span>
+                                <!-- 投稿者ID -->
+                                <span>／投稿者：<?php echo isset($post_item['contributor_username']) ? $post_item['contributor_username'] : '不明なユーザー'; ?></span>
+                                <!-- 投稿内容 -->
+                                <p class="p-pre"><?php echo $post_item['comment']; ?></p>
+                                <!-- 投稿日時 -->
+                                <span class="post-datetime">投稿日時：<?php echo $post_item['created_at']; ?></span>
+                                <!-- 更新日時 -->
+                                <?php if ($post_item['created_at'] < $post_item['updated_at']) : ?>
+                                    <span class="post-datetime post-datetime__updated">更新日時：<?php echo $post_item['updated_at']; ?></span>
+                                    <?php endif; ?>
+                                </form>
+                                <!-- 自分の投稿内容かつセッションが有効な間は編集・削除が可能 -->
+                                <?php if (strpos($post_item['participants'], $cont_id) !== false) : ?>
+                                    <form action="Paticipation.php" method="post">
+                                        <button type="submit" name="participate_btn">詳細へ移動</button>
+                                        <input type="hidden" name="post_id" value="<?php echo $post_item['id']; ?>">
+                                    </form>
+                                <?php endif; ?>
+                                <?php if (strpos($post_item['participants'], $cont_id) === false) : ?>
+                                    <?php if (strpos($post_item['participants_wait'], $cont_id) === false) : ?>
+                                        <form action="Paticipation_wait.php" method="post">
+                                            <button type="submit" name="apply_btn">参加申請</button>
+                                            <input type="hidden" name="post_id" value="<?php echo $post_item['id']; ?>">
+                                        </form>
+                                    <?php endif; ?>
+                                <?php endif; ?>
+                                <?php if ($post_item['contributor_id'] === $cont_id) : ?>
+                                    <div class="btn-flex">
+                                        <form action="update-edit.php" method="post">
+                                            <button type="submit" name="update_btn">編集</button>
+                                            <input type="hidden" name="post_id" value="<?php echo $post_item['id']; ?>">
+                                        </form>
+                                        <form action="delete-confirm.php" method="post">
+                                            <button type="submit" name="delete_btn">削除</button>
+                                            <input type="hidden" name="post_id" value="<?php echo $post_item['id']; ?>">
+                                        </form>
+                                        <form action="Paticipation_edit.php" method="post">
+                                            <button type="submit" name="confirm_btn">参加者管理</button>
+                                            <input type="hidden" name="post_id" value="<?php echo $post_item['id']; ?>">
+                                        </form>
+                                    </div>
+                                <?php endif; ?>
+                                <?php if (isset($_SESSION['id']) && ($_SESSION['id'] == $post_item['id'])): ?>
+                                    <p class='updated-post'>更新しました</p>
+                                <?php endif; ?>
+                            </li>
+                        <?php endforeach; ?>
+                    </ul>
+                <?php endif; ?>
+            </div>
         </section>
     <?php endif; ?>
-<hr>
-<!-- 投稿一覧 -->
-<section class="post-list">
-<?php if (count($post_list) === 0) : ?>
-<!-- 投稿が無いときはメッセージを表示する -->
-<p class="no-post-msg">現在、投稿はありません。</p>
-<?php else : ?>
-<ul>
-<!-- 投稿情報の出力 -->
-<?php foreach ($post_list as $post_item) : ?>
-<li>
-<form action="" method="post">
-<!-- 投稿ID -->
-<span>ID：<?php echo $post_item['id']; ?>　</span>
-<!-- 投稿タイトル -->
-<span><?php echo $post_item['title']; ?></span>
-<!-- 投稿者ID -->
-<span>／投稿者：<?php echo isset($post_item['contributor_username']) ? $post_item['contributor_username'] : '不明なユーザー'; ?></span>
-<!-- 投稿内容 -->
-<p class="p-pre"><?php echo $post_item['comment']; ?></p>
-<!-- 投稿日時 -->
-<span class="post-datetime">投稿日時：<?php echo $post_item['created_at']; ?></span>
-<!-- 過去に更新されていたら更新日時も表示 -->
- 
-<?php if ($post_item['created_at'] < $post_item['updated_at']) : ?>
-<span class="post-datetime post-datetime__updated">更新日時：<?php echo $post_item['updated_at']; ?></span>
-<?php endif; ?>
-</form>
-<!-- 自分の投稿内容かつセッションが有効な間は編集・削除が可能 -->
-<?php if (strpos($post_item['participants'], $cont_id) !== false) : ?>
-                <form action="Paticipation.php" method="post">
-                        <button type="submit" name="update_btn">参加</button>
-                        <input type="hidden" name="post_id" value="<?php echo $post_item['id']; ?>">
-                </form>
-                <?php endif; ?>
-                <?php if (strpos($post_item['participants'], $cont_id) === false) : ?>
-                    <?php if (strpos($post_item['participants_wait'], $cont_id) === false) : ?>
-                    <form action="Paticipation_wait.php" method="post">
-                        <button type="submit" name="update_btn">参加申請</button>
-                        <input type="hidden" name="post_id" value="<?php echo $post_item['id']; ?>">
-                    </form>
-                    <?php endif; ?>
-                <?php endif; ?>
-<?php if ($post_item['contributor_id'] === $cont_id) : ?>
-<div class="btn-flex">
-<form action="update-edit.php" method="post">
-<button type="submit" name="update_btn">編集</button>
-<input type="hidden" name="post_id" value="<?php echo $post_item['id']; ?>">
-</form>
-<form action="delete-confirm.php" method="post">
-<button type="submit" name="delete_btn">削除</button>
-<input type="hidden" name="post_id" value="<?php echo $post_item['id']; ?>">
-</form>
-<form action="Paticipation_edit.php" method="post">
-                        <button type="submit" name="delete_btn">参加者管理</button>
-                        <input type="hidden" name="post_id" value="<?php echo $post_item['id']; ?>">
-                    </form>
-</div>
-<?php endif; ?>
-<?php if (isset($_SESSION['id']) && ($_SESSION['id'] == $post_item['id'])): ?>
-<p class='updated-post'>更新しました</p>
-<?php endif; ?>
-</li>
-<?php endforeach; ?>
-</ul>
-<?php endif; ?>
-</section>
 </body>
 
 </html>

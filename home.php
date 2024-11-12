@@ -1,39 +1,20 @@
 <?php
-    session_start();
-    if( !isset($_SESSION['uid'] )) {
-        header("Location: logout.php");
-        exit;
-    }
-    require_once("dbconnect.php");
+// 必要なPHPコードをここに追加 (ログインチェックやデータ取得など)
 ?>
+
 <!DOCTYPE html>
 <html lang="ja">
 <head>
     <meta charset="UTF-8">
-    <title>HOME</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ホーム - 掲示板アプリ</title>
 </head>
 <body>
-
-<?php
-$uid=$_SESSION['uid'];
-
-$sql = "SELECT Name FROM Account WHERE UID=:uid";
-try {
-	$stmt=$dbcon->prepare($sql);
-        $stmt->bindParam(":uid", $uid);
-        $stmt->execute ();
-	$tmp=$stmt->fetch(PDO::FETCH_ASSOC);
-} catch(PDOException $e){
-	echo "GetNameByUid failed:" . $e->getMessage() . "<br>\n";
-}
-
-$name=htmlspecialchars($tmp['Name']);
-
-echo<<<EOD
-<h1>HELLO, {$name}!</h1>
-
-<a href="logout.php">[Logout]</a>
-EOD;
-?>
+    <header>
+        <h1>ホーム画面</h1>
+    </header>
+    <main>
+        <p>掲示板アプリの最新情報やおすすめ投稿などを紹介します。</p>
+    </main>
 </body>
 </html>

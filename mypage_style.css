@@ -1,0 +1,164 @@
+/* 基本のスタイル */
+body {
+    font-family: Arial, sans-serif; /* シンプルなフォント */
+    background-color: #f4f4f4; /* 背景色は淡いグレー */
+    color: #333; /* 文字色はダークグレー */
+    margin: 0;
+    padding: 0;
+    display: flex;
+    justify-content: center; /* 横方向中央揃え */
+    align-items: center; /* 縦方向中央揃え */
+    height: 100vh; /* ビューポートの高さを100%に */
+    flex-direction: column; /* 上から順に並べる */
+}
+
+/* センター配置のためのラッパー */
+.container {
+    background-color: #fff; /* 白い背景 */
+    padding: 20px; /* 内側の余白 */
+    border-radius: 8px; /* 角を丸くする */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* 軽い影 */
+    width: 100%;
+    max-width: 800px; /* 最大幅800px */
+    box-sizing: border-box;
+}
+
+/* タイトル */
+h1 {
+    text-align: center; /* 中央揃え */
+    color: #4CAF50; /* 緑色 */
+    font-size: 24px;
+    margin: 40px 0 20px; /* 上に40pxの余白、下に20pxの余白 */
+}
+
+
+/* フォームのスタイル */
+form {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr); /* 2列のレイアウト */
+    gap: 20px; /* 各フォーム項目の間に余白を設ける */
+    grid-template-areas: 
+        "last_name last_name_kana"
+        "first_name first_name_kana"
+        "username birthdate"
+        "phone email"
+        "pass submit";
+}
+
+/* 各フォームセクションのスタイル */
+form div {
+    display: flex;
+    flex-direction: column;
+    padding: 15px;
+    background-color: #fafafa; /* 薄いグレー背景 */
+    border: 1px solid #ddd; /* 薄いボーダー */
+    border-radius: 8px; /* 角を丸くする */
+    box-sizing: border-box;
+}
+
+/* セクション間の仕切り線 */
+form div + div {
+    margin-top: 15px; /* 各セクション間に余白 */
+}
+
+/* フォームラベル */
+label {
+    font-weight: bold;
+    color: #333;
+    margin-bottom: 5px;
+}
+
+/* 入力フィールドのスタイル */
+input[type="text"],
+input[type="date"],
+input[type="tel"],
+input[type="email"],
+input[type="password"] {
+    padding: 10px;
+    font-size: 14px;
+    border: 1px solid #ccc; /* 明るいグレーのボーダー */
+    border-radius: 4px; /* 角を丸く */
+    width: 100%; /* 入力フィールドを全幅に */
+    box-sizing: border-box; /* ボックスモデルを調整 */
+}
+
+/* ボタンのスタイル */
+button {
+    padding: 10px 20px;
+    font-size: 16px;
+    color: white;
+    background-color: #4CAF50; /* 緑色 */
+    border: none;
+    border-radius: 4px; /* 角を丸く */
+    cursor: pointer;
+    transition: background-color 0.3s; /* 背景色変更のトランジション */
+    grid-column: span 2; /* ボタンを2列分にする */
+}
+
+button:hover {
+    background-color: #45a049; /* ホバー時の色変更 */
+}
+
+/* リンクのスタイル */
+a {
+    color: #4CAF50; /* 緑色 */
+    text-decoration: none; /* 下線なし */
+}
+
+a:hover {
+    text-decoration: underline; /* ホバー時に下線を表示 */
+    color: #45a049; /* ホバー時に色変更 */
+}
+
+/* フォームのリンクのスタイル */
+form p {
+    text-align: center; /* 中央揃え */
+    margin-top: 20px; /* 上部に余白を追加 */
+    font-size: 14px;
+}
+
+/* エラー表示用のクラス（必要に応じて追加） */
+.err {
+    color: red;
+    font-size: 12px;
+    margin-top: 5px;
+}
+
+/* プロフィール項目のスタイル */
+p {
+    font-size: 16px;
+    margin: 10px 0;
+    padding: 10px;
+    background-color: #fafafa; /* 薄いグレー背景 */
+    border-radius: 5px; /* 角を丸くする */
+    border: 1px solid #ddd; /* 薄いボーダー */
+    width: 100%; /* 横幅を100%に */
+    max-width: 600px; /* 最大幅を600pxに設定 */
+    margin-left: auto; /* 左側を自動で調整 */
+    margin-right: auto; /* 右側を自動で調整 */
+}
+
+/* リンクのスタイル */
+a {
+    color: #4CAF50; /* 緑色 */
+    text-decoration: none; /* 下線なし */
+    font-size: 16px;
+    display: block;
+    margin-top: 20px; /* 上に少し余白を追加 */
+}
+
+a:hover {
+    text-decoration: underline; /* ホバー時に下線を表示 */
+    color: #45a049; /* ホバー時に色変更 */
+}
+
+/* プロフィール画像のスタイル */
+.profile-pic {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%; /* 画像を丸く表示 */
+    object-fit: cover; /* 画像を枠内に収める */
+    border: 2px solid #ccc; /* 画像周りの境界線 */
+}
+
+

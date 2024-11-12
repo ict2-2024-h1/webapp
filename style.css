@@ -1,11 +1,26 @@
 /* 全体の背景とレイアウト */
 body {
-    margin: 0 auto;
-    width: 700px;
-    background-color: rgb(224, 224, 224);
-    font-family: Arial, sans-serif;
-    background-image: radial-gradient(circle, rgba(255, 255, 255, 0.3) 20%, rgba(224, 224, 224, 0) 20%); /* 背景模様 */
-    background-size: 20px 20px; /* パターンのサイズ */
+    font-family: 'Arial', sans-serif;
+    margin: 20px;
+}
+header {
+    font-size: 24px;
+    margin-bottom: 10px;
+}
+
+nav {
+    display: flex;
+    justify-content: space-between;
+    border-bottom: 2px solid #000;
+    padding-bottom: 10px;
+    margin-bottom: 20px;
+}
+
+nav a {
+    text-decoration: none;
+    margin: 0 10px;
+    color: #000;
+    font-weight: bold;
 }
 
 hr {
@@ -41,7 +56,6 @@ input, textarea {
 textarea {
     line-height: 1.5;
 }
-
 /* ボタンのデザイン */
 button {
     display: block;
@@ -76,6 +90,27 @@ button[name="cancel_btn"] {
     background-color: rgb(182, 182, 182);
 }
 
+/* 新たに追加したボタンの色設定 */
+button[name="participate_btn"] {
+    border: 1px solid rgb(0, 123, 255);
+    background-color: rgb(0, 102, 204);
+}
+
+button[name="apply_btn"] {
+    border: 1px solid rgb(255, 193, 7);
+    background-color: rgb(255, 193, 7);
+}
+
+button[name="confirm_btn"] {
+    border: 1px solid rgb(255, 0, 255);
+    background-color: rgb(255, 20, 147);
+}
+
+button[name="back_btn"] {
+    border: 1px solid rgb(0, 255, 127);
+    background-color: rgb(0, 204, 102);
+}
+
 /* ボタンのホバースタイル */
 button[name="post_btn"]:hover {
     background-color: rgb(116, 116, 255);
@@ -95,17 +130,68 @@ button[name="cancel_btn"]:hover {
     background-color: rgb(189, 189, 189);
 }
 
+/* 新たに追加したボタンのホバースタイル */
+button[name="participate_btn"]:hover {
+    background-color: rgb(0, 140, 255);
+}
+
+button[name="apply_btn"]:hover {
+    background-color: rgb(255, 221, 51);
+}
+
+button[name="confirm_btn"]:hover {
+    background-color: rgb(255, 100, 255);
+}
+
+button[name="back_btn"]:hover {
+    background-color: rgb(0, 255, 90);
+}
+
 .btn--mg-c {
     margin: 0 auto;
 }
 
+
 /* 投稿リスト */
-.post-list button {
+/* 親要素に対してflexboxを設定 */
+.post-container {
+    display: flex;             /* 横並びにするための設定 */
+    justify-content: space-between;  /* 子要素間にスペースを作る */
+    gap: 20px;                 /* 子要素間に適度な間隔を追加 */
+}
+
+/* 投稿フォームのスタイル */
+.post-form-container {
+    flex: 1;                   /* 横幅を均等にする */
+    max-width: 500px;          /* 必要に応じて最大幅を設定 */
+}
+
+/* 投稿一覧のスタイル */
+.post-list-container {
+    flex: 2;                   /* 投稿一覧部分を少し広くする */
+    max-width: 800px;          /* 必要に応じて最大幅を設定 */
+}
+
+/* 画面が小さい場合のレスポンシブ対応 */
+@media screen and (max-width: 768px) {
+    .post-container {
+        flex-direction: column;  /* 小さい画面では縦並びに変更 */
+        align-items: center;     /* 中央揃え */
+    }
+    .post-form-container,
+    .post-list-container {
+        max-width: 100%;         /* 幅を100%にして、画面いっぱいに広げる */
+    }
+}
+
+
+
+.post-list-container button {
     margin: 30px 0 0 0;
     padding: 8px 20px;
 }
 
-.post-list li {
+.post-list-container li {
     margin-bottom: 15px;
     padding: 20px 30px;
     background-color: #fff;
@@ -113,24 +199,24 @@ button[name="cancel_btn"]:hover {
     border-radius: 10px;
 }
 
-.post-list span {
+.post-list-container span {
     display: inline-block;
     margin-bottom: 25px;
 }
 
 /* フォームのレイアウト */
-.post-form__flex {
+.post-form_flex {
     display: flex;
     justify-content: center;
     column-gap: 15px;
     margin-bottom: 20px;
 }
 
-.post-form__flex > div:first-child {
+.post-form_flex > div:first-child {
     width: 250px;
 }
 
-.post-form__flex > div:last-child {
+.post-form_flex > div:last-child {
     flex: 1;
 }
 
@@ -140,7 +226,7 @@ button[name="cancel_btn"]:hover {
     column-gap: 15px;
 }
 
-.post-list li:last-child {
+.post-list-container li:last-child {
     margin-bottom: 0;
 }
 

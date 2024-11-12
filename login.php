@@ -2,7 +2,7 @@
     require_once("dbconnect.php"); 
     $username = $_POST['username'];
     $pass = $_POST['pass'];
-    $user_type = $_POST['user_type'];
+    //$user_type = $_POST['user_type'];
     // Usernameで検索するSQL文
     $sql = "SELECT UID, Pass,User_type FROM Account WHERE Username = :username";
     try {
@@ -16,7 +16,7 @@
             echo <<<EOD
             <html>
             <head><title>ERROR</title></head>
-            <link rel="stylesheet" type="text/css" href="style.css">
+            <link rel="stylesheet" type="text/css" href="board_style.css">
             <body>
             <h1>ERROR</h1>
             <div class="err">ユーザーネームまたはパスワードが違います</div>
