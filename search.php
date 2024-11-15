@@ -77,7 +77,7 @@ if (isset($_POST['search_language_btn'])) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>掲示板アプリ</title>
-    <link rel="stylesheet" href="./style.css">
+    <link rel="stylesheet" href="./board_style.css">
 </head>
 <body>
     <h1>掲示板アプリ</h1>
@@ -88,7 +88,7 @@ if (isset($_POST['search_language_btn'])) {
                 <div>
                     <label>
                         <p>カテゴリ検索</p>
-                        <input type="text" name="post_title" value="<?php if (isset($_POST['post_title'])) echo htmlspecialchars($_POST['post_title'], ENT_QUOTES, 'UTF-8'); ?>">
+                        <input type="text" name="post__title" value="<?php if (isset($_POST['post_title'])) echo htmlspecialchars($_POST['post_title'], ENT_QUOTES, 'UTF-8'); ?>">
                     </label>
                 </div>
             </div>
@@ -110,7 +110,7 @@ if (isset($_POST['search_language_btn'])) {
                 <div>
                     <label>
                         <p>投稿内容検索</p>
-                        <input type="text" name="post_title" value="<?php if (isset($_POST['post_title'])) echo htmlspecialchars($_POST['post_title'], ENT_QUOTES, 'UTF-8'); ?>">
+                        <input type="text" name="post__title" value="<?php if (isset($_POST['post_title'])) echo htmlspecialchars($_POST['post_title'], ENT_QUOTES, 'UTF-8'); ?>">
                     </label>
                 </div>
             </div>

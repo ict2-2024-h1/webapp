@@ -62,6 +62,7 @@ $profile = $stmt->fetch(PDO::FETCH_ASSOC);
                 <label>専攻:</label>
                 <p><?php echo htmlspecialchars($profile['Major']); ?></p>
             </div>
+            <button type="submit" name="participate_btn">スカウトメッセージを送信</button>
         </div>
         <p><a href="board.php">掲示板に戻る</a></p>
     </div>

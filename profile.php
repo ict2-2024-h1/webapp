@@ -30,6 +30,7 @@ $profile = $stmt->fetch(PDO::FETCH_ASSOC);
 </head>
 <body>
     <div class="container">
+    <h1>*</h1>
         <h1>プロフィール</h1>
 
         <div class="profile-info">

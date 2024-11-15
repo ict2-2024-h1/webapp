@@ -69,6 +69,7 @@ if (isset($_POST['participate_btn']) && isset($_POST['post_id'])) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>参加掲示板</title>
+    <link rel="stylesheet" href="./board_style.css">
 </head>
 <body>
     <h1>投稿 ID <?php echo htmlspecialchars($post_id, ENT_QUOTES, 'UTF-8'); ?> の掲示板</h1>

@@ -236,6 +236,7 @@ try {
 
             <!-- 投稿フォーム -->
             <div class="post-form-container">
+            <h2 class="form-title">投稿フォーム</h2> <!-- タイトルを追加 --> 
                 <form action="#" method="post">
                     <div class="post-form_flex">
 
@@ -309,6 +310,7 @@ try {
             
             <!-- 投稿一覧 -->
             <div class="post-list-container">
+            <h2 class="form-title">投稿一覧</h2> <!-- タイトルを追加 --> 
                 <?php if (count($post_list) === 0) : ?>
                     <!-- 投稿が無いときはメッセージを表示する -->
                     <p class="no-post-msg">現在、投稿はありません。</p>
@@ -350,47 +352,53 @@ try {
                                     }
                                 }
                                 ?>
-                                <span>／投稿者：
-                                <form action="companyprofile.php" method="post">
-                                    <button type="submit" name="studentprof_btn" value="studentprof_btn"><?php echo $username; ?></button>
-                                    <input type="hidden" name="user_id" value="<?php echo $post_item['contributor_id']; ?>">
-                                </form>
-                                </span>
+                                <div class="post-info">
+                                    <span>／投稿者：</span>
+                                    <form action="profile.php" method="post">
+                                        <button type="submit" name="studentprof_btn" value="studentprof_btn" class="pink-button"><?php echo $username; ?></button>
+                                        </button>
+                                        <input type="hidden" name="user_id" value="<?php echo $post_item['contributor_id']; ?>">
+                                    </form>
+                                </div>
 
                                 <!-- 投稿内容 -->
                                 <p class="p-pre"><?php echo $post_item['comment']; ?></p>
+
                                 <!-- 投稿日時 -->
                                 <span class="post-datetime">投稿日時：<?php echo $post_item['created_at']; ?></span>
+
                                 <!-- 更新日時 -->
                                 <?php if ($post_item['created_at'] < $post_item['updated_at']) : ?>
-                                    <span class="post-datetime post-datetime__updated">更新日時：<?php echo $post_item['updated_at']; ?></span>
-                                    <?php endif; ?>
+                                <span class="post-datetime post-datetime__updated">更新日時：<?php echo $post_item['updated_at']; ?></span>
+                                <?php endif; ?>
                                 <!-- 自分の投稿内容かつセッションが有効な間は編集・削除が可能 -->
                                 <?php if (strpos($post_item['participants'], $cont_id) !== false) : ?>
-                                    <form action="Paticipation.php" method="post">
+                                    <form class="form-inline" action="Paticipation.php" method="post">
                                         <button type="submit" name="participate_btn">詳細へ移動</button>
                                         <input type="hidden" name="post_id" value="<?php echo $post_item['id']; ?>">
                                     </form>
                                 <?php endif; ?>
+
                                 <?php if (strpos($post_item['participants'], $cont_id) === false) : ?>
                                     <?php if (strpos($post_item['participants_wait'], $cont_id) === false) : ?>
-                                        <form action="Paticipation_wait.php" method="post">
+                                        <form class="form-inline" action="Paticipation_wait.php" method="post">
                                             <button type="submit" name="apply_btn">参加申請</button>
                                             <input type="hidden" name="post_id" value="<?php echo $post_item['id']; ?>">
                                         </form>
                                     <?php endif; ?>
                                 <?php endif; ?>
+
                                 <?php if ($post_item['contributor_id'] === $cont_id) : ?>
                                     <div class="btn-flex">
-                                        <form action="update-edit.php" method="post">
+                                        <form class="form-inline" action="update-edit.php" method="post">
                                             <button type="submit" name="update_btn">編集</button>
                                             <input type="hidden" name="post_id" value="<?php echo $post_item['id']; ?>">
                                         </form>
-                                        <form action="delete-confirm.php" method="post">
+                                        <form class="form-inline" action="delete-confirm.php" method="post">
                                             <button type="submit" name="delete_btn">削除</button>
                                             <input type="hidden" name="post_id" value="<?php echo $post_item['id']; ?>">
                                         </form>
-                                        <form action="Paticipation_edit.php" method="post">
+                                        <form class="form-inline" action="Paticipation_edit.php" method="post">
                                             <button type="submit" name="confirm_btn">参加者管理</button>
                                             <input type="hidden" name="post_id" value="<?php echo $post_item['id']; ?>">
                                         </form>
@@ -460,7 +468,7 @@ try {
                                 ?>
                                 <span>／投稿者：
                                 <form action="companyprofile.php" method="post">
-                                    <button type="submit" name="studentprof_btn" value="studentprof_btn"><?php echo $username; ?></button>
+                                <button type="submit" name="studentprof_btn" value="studentprof_btn" class="pink-button"><?php echo $username; ?></button>
                                     <input type="hidden" name="user_id" value="<?php echo $post_item['contributor_id']; ?>">
                                 </form>
                                 </span>

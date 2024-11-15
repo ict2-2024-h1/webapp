@@ -42,7 +42,16 @@ if (isset($_POST['apply_btn'])) {
     $stmt = $pdo->prepare($sql);
     $stmt->execute([$updated_waiting_list, $post_id]);
 
-    echo "参加申請が送信されました。";
+    echo "参加申請が送信されました。3秒後に自動で掲示板TOPへ戻ります。";
     header('refresh: 3; url=board.php');
 }
 ?>
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>掲示板アプリ</title>
+    <link rel="stylesheet" href="./style.css">
+</head>

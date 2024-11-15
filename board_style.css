@@ -92,7 +92,22 @@ button {
 button:hover {
     background-color: #45a049;
 }
+/* 特定のボタンにピンク色を適用 */
+.pink-button {
+    background-color: rgb(255, 105, 180)!important; /* ピンク色 */
+    color: #fff!important; /* 文字色を白に */
+    padding: 10px 20px; /* 内側の余白 */
+    border: none; /* ボーダーをなくす */
+    border-radius: 5px; /* 角を丸く */
+    cursor: pointer; /* カーソルをポインタに変更 */
+    font-size: 16px; /* フォントサイズ */
+    transition: background-color 0.3s ease; /* ホバー時のアニメーション */
+}
 
+/* ホバー時に背景色を少し明るく */
+.pink-button:hover {
+    background-color: rgb(255, 20, 147)!important; /* 明るいピンク */
+}
 /* 投稿一覧のリスト */
 ul {
     list-style: none;
@@ -122,3 +137,55 @@ li {
         margin-bottom: 20px;  /* 下に少し余白を追加 */
     }
 }
+.btn-flex,
+.form-container {
+  display: flex;
+  gap: 10px; /* ボタンの左右の間隔 */
+  align-items: center; /* ボタンを中央揃え */
+}
+
+.form-inline {
+  display: inline; /* フォームをインライン表示 */
+  margin: 5px 0; /* 上下の余白を設定 */
+}
+
+button {
+  margin: 5px 0; /* ボタンの上下の余白を設定 */
+}
+
+.btn-flex {
+    display: flex;
+    gap: 10px; /* ボタン間のスペース */
+    align-items: center; /* 垂直方向に要素を中央揃え */
+  }
+  
+  .btn-flex form {
+    display: inline; /* フォームをインライン表示 */
+    margin: 0; /* 不要な余白を削除 */
+  }
+  
+  
+  form {
+    margin: 0; /* フォーム間の余白をなくすため */
+  }
+
+  .post-info {
+    display: flex;
+    align-items: center; /* 垂直方向に要素を中央揃え */
+    gap: 10px; /* 要素間のスペース */
+  }
+  
+  .post-info form {
+    display: inline; /* インライン表示でボタンを調整 */
+    margin: 0; /* 不要な余白を削除 */
+  }
+  
+  .post-datetime {
+    display: block; /* 独立して表示 */
+    margin-top: 5px; /* 上部にスペースを追加 */
+  }
+  
+  .p-pre {
+    margin-bottom: 10px; /* 投稿内容と次の要素間にスペース */
+  }
+  
